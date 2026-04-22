@@ -90,6 +90,33 @@ export function useQuests(wallet) {
     }
   };
 
+  const sendTxAndExtractDeploy = async (fn, contract) => {
+    setTxPending(true); setError(null); setLastTx(null);
+    try {
+      const tx = await fn();
+      setLastTx({ status: "pending", hash: tx.hash });
+      const receipt = await tx.wait();
+      let deployed = null;
+      for (const log of receipt.logs || []) {
+        try {
+          const parsed = contract.interface.parseLog(log);
+          if (parsed?.name === "ContractDeployed") { deployed = parsed.args.deployed; break; }
+        } catch { /* not our event */ }
+      }
+      const tail = deployed ? ` — contract ${deployed.slice(0, 6)}…${deployed.slice(-4)}` : "";
+      setLastTx({ status: "success", hash: tx.hash, deployed, msg: `🚀 Contract deployed on Base! +100 XP${tail}` });
+      await loadUserData();
+    } catch (err) {
+      const msg = err?.reason || err?.message || "Transaction failed";
+      if (!msg.includes("user rejected") && !msg.includes("User denied") && !msg.includes("rejected")) {
+        setError(msg.slice(0, 160));
+      }
+      setLastTx(null);
+    } finally {
+      setTxPending(false);
+    }
+  };
+
   const FEE = ethers.parseEther("0.00005");
 
   const completeTask = async (taskId, fieldValues = {}) => {
@@ -97,18 +124,20 @@ export function useQuests(wallet) {
     const contract = getCoreContract(signer);
 
     switch (taskId) {
-      case "gm":
+      case "gm": {
+        const msg = (fieldValues.gmMessage || "").trim().slice(0, 140);
         return sendTx(
-          () => contract.completeGMTask({ value: FEE }),
-          "☀️ GM sent! +50 XP"
+          () => contract.completeGMTask(msg, { value: FEE }),
+          "☀️ GM posted on-chain! +50 XP"
         );
-      case "deploy":
-        if (!fieldValues.deployedContract || !ethers.isAddress(fieldValues.deployedContract))
-          return setError("Enter a valid deployed contract address");
-        return sendTx(
-          () => contract.completeDeployTask(fieldValues.deployedContract, { value: FEE }),
-          "🚀 Deploy verified! +100 XP"
+      }
+      case "deploy": {
+        const greeting = (fieldValues.greeting || "").trim().slice(0, 140);
+        return sendTxAndExtractDeploy(
+          () => contract.completeDeployTask(greeting, { value: FEE }),
+          contract,
         );
+      }
       case "swap":
         return sendTx(
           () => contract.completeSwapTask({ value: FEE }),
