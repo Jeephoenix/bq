@@ -1,10 +1,31 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+/// @title BaseQuestGreeter
+/// @notice Tiny on-chain greeter deployed by users via the GM Base / Deploy Contract quests.
+contract BaseQuestGreeter {
+    address public deployer;
+    string  public greeting;
+    uint256 public deployedAt;
+
+    event Greeted(address indexed deployer, string greeting);
+
+    constructor(address _deployer, string memory _greeting) {
+        deployer   = _deployer;
+        greeting   = _greeting;
+        deployedAt = block.timestamp;
+        emit Greeted(_deployer, _greeting);
+    }
+}
+
+/// @title BaseQuestCore (v2)
+/// @notice Quest engine — XP, daily tasks, leaderboard, partner XP, migration & on-chain GM/Deploy quests.
 contract BaseQuestCore {
     address public contractOwner;
     uint256 public rewardPool;
     uint256[6] public levelThresholds = [0, 500, 1500, 3500, 7500, 15000];
+
+    uint256 public constant QUEST_FEE = 0.00005 ether;
 
     uint256 constant BIT_GM           = 1 << 0;
     uint256 constant BIT_DEPLOY       = 1 << 1;
@@ -41,10 +62,19 @@ contract BaseQuestCore {
     mapping(address => bool)        public isPartnerContract;
     address[] public allUsers;
 
+    // ── On-chain GM + Deploy artefacts ────────────────────────────────────
+    mapping(address => string)   public lastGM;
+    mapping(address => uint256)  public lastGMAt;
+    mapping(address => address)  public lastDeployedContract;
+    mapping(address => uint256)  public deployCount;
+
     event TaskCompleted(address indexed user, string taskType, uint256 xpEarned, uint256 timestamp);
     event UsernameSet(address indexed user, string username);
     event StreakBonusAwarded(address indexed user, uint256 streak, uint256 xpEarned);
     event XPAwarded(address indexed user, uint256 amount, uint256 newTotal);
+    event GMPosted(address indexed user, string message, uint256 timestamp);
+    event ContractDeployed(address indexed user, address indexed deployed, string greeting, uint256 timestamp);
+    event UserMigrated(address indexed user, uint256 totalXP, uint256 tasksCompleted, uint256 streakCount);
 
     modifier onlyOwner()  { require(msg.sender == contractOwner, "BaseQuestCore: not owner"); _; }
     modifier registered() { if (!isRegistered[msg.sender]) _registerUser(msg.sender); _; }
@@ -54,9 +84,10 @@ contract BaseQuestCore {
     function _today() internal view returns (uint256) { return block.timestamp / 86400; }
 
     function _registerUser(address user) internal {
+        if (isRegistered[user]) return;
         isRegistered[user] = true;
         allUsers.push(user);
-        profiles[user].joinedAt = block.timestamp;
+        if (profiles[user].joinedAt == 0) profiles[user].joinedAt = block.timestamp;
     }
 
     function _resetDailyIfNeeded(address user) internal {
@@ -74,12 +105,27 @@ contract BaseQuestCore {
         dailyTasks[user].bits |= bit;
     }
 
+    /// @dev Default fee split: 20 % to owner, 80 % into rewardPool (boss-raid economics).
     function _awardXPAndDistribute(address user, uint256 xp, string memory taskType) internal {
         uint256 ownerCut = msg.value / 5;
         rewardPool += msg.value - ownerCut;
-        (bool sent, ) = payable(contractOwner).call{value: ownerCut}("");
-        require(sent, "BaseQuestCore: owner transfer failed");
+        if (ownerCut > 0) {
+            (bool sent, ) = payable(contractOwner).call{value: ownerCut}("");
+            require(sent, "BaseQuestCore: owner transfer failed");
+        }
+        _awardXPOnly(user, xp, taskType);
+    }
 
+    /// @dev Deploy-quest fee path: 100 % of msg.value forwarded to the contract owner.
+    function _awardXPOwnerOnly(address user, uint256 xp, string memory taskType) internal {
+        if (msg.value > 0) {
+            (bool sent, ) = payable(contractOwner).call{value: msg.value}("");
+            require(sent, "BaseQuestCore: owner transfer failed");
+        }
+        _awardXPOnly(user, xp, taskType);
+    }
+
+    function _awardXPOnly(address user, uint256 xp, string memory taskType) internal {
         uint256 today = _today();
         UserProfile storage p = profiles[user];
         if (p.lastActivityDay == 0)              { p.streakCount = 1; }
@@ -99,25 +145,45 @@ contract BaseQuestCore {
 
     // ── Main tasks ────────────────────────────────────────────────────────
 
-    function completeGMTask() external payable registered {
-        require(msg.value == 0.00005 ether, "BaseQuestCore: incorrect payment");
+    /// @notice Post an on-chain "GM Base" message and earn XP.
+    /// @param  message Optional message body (defaults to "GM Base!" if empty). Max 140 chars.
+    function completeGMTask(string calldata message) external payable registered {
+        require(msg.value == QUEST_FEE, "BaseQuestCore: incorrect payment");
+        require(bytes(message).length <= 140, "BaseQuestCore: message too long");
         _resetDailyIfNeeded(msg.sender);
         require(!_isDone(msg.sender, BIT_GM), "BaseQuestCore: already done today");
         _setDone(msg.sender, BIT_GM);
+
+        string memory body = bytes(message).length == 0 ? "GM Base!" : message;
+        lastGM[msg.sender]   = body;
+        lastGMAt[msg.sender] = block.timestamp;
+        emit GMPosted(msg.sender, body, block.timestamp);
+
         _awardXPAndDistribute(msg.sender, 50, "GM_BASE");
     }
 
-    function completeDeployTask(address deployedContract) external payable registered {
-        require(msg.value == 0.00005 ether, "BaseQuestCore: incorrect payment");
-        require(deployedContract != address(0), "BaseQuestCore: invalid address");
+    /// @notice Deploy a real on-chain BaseQuestGreeter contract and earn XP.
+    /// @param  greeting Greeting baked into the deployed contract. Defaults to "GM Base!" if empty. Max 140 chars.
+    /// @return deployed Address of the freshly deployed contract.
+    function completeDeployTask(string calldata greeting) external payable registered returns (address deployed) {
+        require(msg.value == QUEST_FEE, "BaseQuestCore: incorrect payment");
+        require(bytes(greeting).length <= 140, "BaseQuestCore: greeting too long");
         _resetDailyIfNeeded(msg.sender);
         require(!_isDone(msg.sender, BIT_DEPLOY), "BaseQuestCore: already done today");
         _setDone(msg.sender, BIT_DEPLOY);
-        _awardXPAndDistribute(msg.sender, 100, "DEPLOY_CONTRACT");
+
+        string memory body = bytes(greeting).length == 0 ? "GM Base!" : greeting;
+        BaseQuestGreeter g = new BaseQuestGreeter(msg.sender, body);
+        deployed = address(g);
+        lastDeployedContract[msg.sender] = deployed;
+        deployCount[msg.sender] += 1;
+        emit ContractDeployed(msg.sender, deployed, body, block.timestamp);
+
+        _awardXPOwnerOnly(msg.sender, 100, "DEPLOY_CONTRACT");
     }
 
     function completeSwapTask() external payable registered {
-        require(msg.value == 0.00005 ether, "BaseQuestCore: incorrect payment");
+        require(msg.value == QUEST_FEE, "BaseQuestCore: incorrect payment");
         _resetDailyIfNeeded(msg.sender);
         require(!_isDone(msg.sender, BIT_SWAP), "BaseQuestCore: already done today");
         _setDone(msg.sender, BIT_SWAP);
@@ -125,7 +191,7 @@ contract BaseQuestCore {
     }
 
     function completeBridgeTask() external payable registered {
-        require(msg.value == 0.00005 ether, "BaseQuestCore: incorrect payment");
+        require(msg.value == QUEST_FEE, "BaseQuestCore: incorrect payment");
         _resetDailyIfNeeded(msg.sender);
         require(!_isDone(msg.sender, BIT_BRIDGE), "BaseQuestCore: already done today");
         _setDone(msg.sender, BIT_BRIDGE);
@@ -133,7 +199,7 @@ contract BaseQuestCore {
     }
 
     function completeGameTask() external payable registered {
-        require(msg.value == 0.00005 ether, "BaseQuestCore: incorrect payment");
+        require(msg.value == QUEST_FEE, "BaseQuestCore: incorrect payment");
         _resetDailyIfNeeded(msg.sender);
         require(!_isDone(msg.sender, BIT_GAME), "BaseQuestCore: already done today");
         _setDone(msg.sender, BIT_GAME);
@@ -141,7 +207,7 @@ contract BaseQuestCore {
     }
 
     function completeProfileTask(string calldata username) external payable registered {
-        require(msg.value == 0.00005 ether, "BaseQuestCore: incorrect payment");
+        require(msg.value == QUEST_FEE, "BaseQuestCore: incorrect payment");
         require(!profileTaskDone[msg.sender], "BaseQuestCore: profile already set");
         require(bytes(username).length > 0, "BaseQuestCore: empty username");
         require(bytes(username).length <= 32, "BaseQuestCore: username too long");
@@ -155,7 +221,7 @@ contract BaseQuestCore {
     // ── Swap sub-tasks ────────────────────────────────────────────────────
 
     function completeSwapAerodrome() external payable registered {
-        require(msg.value == 0.00005 ether, "BaseQuestCore: incorrect payment");
+        require(msg.value == QUEST_FEE, "BaseQuestCore: incorrect payment");
         _resetDailyIfNeeded(msg.sender);
         require(!_isDone(msg.sender, BIT_SWAP_AERO), "BaseQuestCore: already done today");
         _setDone(msg.sender, BIT_SWAP_AERO);
@@ -163,7 +229,7 @@ contract BaseQuestCore {
     }
 
     function completeSwapUniswap() external payable registered {
-        require(msg.value == 0.00005 ether, "BaseQuestCore: incorrect payment");
+        require(msg.value == QUEST_FEE, "BaseQuestCore: incorrect payment");
         _resetDailyIfNeeded(msg.sender);
         require(!_isDone(msg.sender, BIT_SWAP_UNI), "BaseQuestCore: already done today");
         _setDone(msg.sender, BIT_SWAP_UNI);
@@ -171,7 +237,7 @@ contract BaseQuestCore {
     }
 
     function completeSwapJumper() external payable registered {
-        require(msg.value == 0.00005 ether, "BaseQuestCore: incorrect payment");
+        require(msg.value == QUEST_FEE, "BaseQuestCore: incorrect payment");
         _resetDailyIfNeeded(msg.sender);
         require(!_isDone(msg.sender, BIT_SWAP_JUMP), "BaseQuestCore: already done today");
         _setDone(msg.sender, BIT_SWAP_JUMP);
@@ -179,7 +245,7 @@ contract BaseQuestCore {
     }
 
     function completeSwapRelay() external payable registered {
-        require(msg.value == 0.00005 ether, "BaseQuestCore: incorrect payment");
+        require(msg.value == QUEST_FEE, "BaseQuestCore: incorrect payment");
         _resetDailyIfNeeded(msg.sender);
         require(!_isDone(msg.sender, BIT_SWAP_RELAY), "BaseQuestCore: already done today");
         _setDone(msg.sender, BIT_SWAP_RELAY);
@@ -189,7 +255,7 @@ contract BaseQuestCore {
     // ── Bridge sub-tasks ──────────────────────────────────────────────────
 
     function completeBridgeJumper() external payable registered {
-        require(msg.value == 0.00005 ether, "BaseQuestCore: incorrect payment");
+        require(msg.value == QUEST_FEE, "BaseQuestCore: incorrect payment");
         _resetDailyIfNeeded(msg.sender);
         require(!_isDone(msg.sender, BIT_BRIDGE_JUMP), "BaseQuestCore: already done today");
         _setDone(msg.sender, BIT_BRIDGE_JUMP);
@@ -197,7 +263,7 @@ contract BaseQuestCore {
     }
 
     function completeBridgeRelay() external payable registered {
-        require(msg.value == 0.00005 ether, "BaseQuestCore: incorrect payment");
+        require(msg.value == QUEST_FEE, "BaseQuestCore: incorrect payment");
         _resetDailyIfNeeded(msg.sender);
         require(!_isDone(msg.sender, BIT_BRIDGE_RELAY), "BaseQuestCore: already done today");
         _setDone(msg.sender, BIT_BRIDGE_RELAY);
@@ -207,7 +273,7 @@ contract BaseQuestCore {
     // ── Deploy sub-tasks ──────────────────────────────────────────────────
 
     function completeDeployRemix() external payable registered {
-        require(msg.value == 0.00005 ether, "BaseQuestCore: incorrect payment");
+        require(msg.value == QUEST_FEE, "BaseQuestCore: incorrect payment");
         _resetDailyIfNeeded(msg.sender);
         require(!_isDone(msg.sender, BIT_DEPLOY_REMIX), "BaseQuestCore: already done today");
         _setDone(msg.sender, BIT_DEPLOY_REMIX);
@@ -223,21 +289,60 @@ contract BaseQuestCore {
     function awardXPFromPartner(address user, uint256 xp) external {
         require(isPartnerContract[msg.sender], "BaseQuestCore: not a partner");
         if (!isRegistered[user]) _registerUser(user);
-        profiles[user].totalXP       += xp;
+        profiles[user].totalXP        += xp;
         profiles[user].tasksCompleted += 1;
         emit XPAwarded(user, xp, profiles[user].totalXP);
     }
 
     // ── Migration ─────────────────────────────────────────────────────────
 
+    /// @notice Restore XP only (kept for backwards compatibility).
     function batchRestoreXP(
         address[] calldata users,
         uint256[] calldata xpAmounts
     ) external onlyOwner {
         require(users.length == xpAmounts.length, "BaseQuestCore: length mismatch");
         for (uint256 i = 0; i < users.length; i++) {
-            if (!isRegistered[users[i]]) _registerUser(users[i]);
+            _registerUser(users[i]);
             profiles[users[i]].totalXP = xpAmounts[i];
+        }
+    }
+
+    /// @notice Full snapshot import from the previous BaseQuestCore.
+    /// @dev    Idempotent — safe to re-run with the same data.
+    function batchMigrateUsers(
+        address[]  calldata users,
+        uint256[]  calldata xps,
+        uint256[]  calldata tasksCompletedArr,
+        uint256[]  calldata streakArr,
+        uint256[]  calldata lastActivityDayArr,
+        uint256[]  calldata joinedAtArr,
+        string[]   calldata usernames,
+        bool[]     calldata profileDoneArr
+    ) external onlyOwner {
+        uint256 n = users.length;
+        require(
+            xps.length == n && tasksCompletedArr.length == n && streakArr.length == n &&
+            lastActivityDayArr.length == n && joinedAtArr.length == n &&
+            usernames.length == n && profileDoneArr.length == n,
+            "BaseQuestCore: length mismatch"
+        );
+        for (uint256 i = 0; i < n; i++) {
+            address u = users[i];
+            _registerUser(u);
+            UserProfile storage p = profiles[u];
+            p.totalXP         = xps[i];
+            p.tasksCompleted  = tasksCompletedArr[i];
+            p.streakCount     = streakArr[i];
+            p.lastActivityDay = lastActivityDayArr[i];
+            p.joinedAt        = joinedAtArr[i] == 0 ? block.timestamp : joinedAtArr[i];
+            if (bytes(usernames[i]).length > 0) {
+                p.username    = usernames[i];
+                p.usernameSet = true;
+                emit UsernameSet(u, usernames[i]);
+            }
+            if (profileDoneArr[i]) profileTaskDone[u] = true;
+            emit UserMigrated(u, xps[i], tasksCompletedArr[i], streakArr[i]);
         }
     }
 
@@ -297,14 +402,18 @@ contract BaseQuestCore {
 
     function getTotalUsers()             external view returns (uint256) { return allUsers.length; }
     function getUserStreak(address user) external view returns (uint256) { return profiles[user].streakCount; }
+    function getLastGM(address user)     external view returns (string memory message, uint256 at) {
+        return (lastGM[user], lastGMAt[user]);
+    }
 
     function transferOwnership(address newOwner) external onlyOwner {
         require(newOwner != address(0), "BaseQuestCore: zero address");
         contractOwner = newOwner;
     }
 
+    /// @notice Withdraw any residual balance. Normally zero because fees go straight to owner.
     function withdrawRewardPool() external onlyOwner {
-        uint256 amount = rewardPool;
+        uint256 amount = address(this).balance;
         require(amount > 0, "BaseQuestCore: nothing to withdraw");
         rewardPool = 0;
         (bool sent, ) = payable(contractOwner).call{value: amount}("");
