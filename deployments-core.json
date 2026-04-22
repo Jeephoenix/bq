@@ -1,0 +1,7 @@
+{
+  "network": "base-mainnet",
+  "chainId": 8453,
+  "deployer": "0x147f83cAf63f6827a6E17549c788BB7e15848db6",
+  "timestamp": "2026-04-22T14:31:09.974Z",
+  "BaseQuestCore": "0xC4A0Ab083212D4bE28ffdFAc9456aE873fcb777d"
+}
