@@ -1,0 +1,161 @@
+{
+  "oldCore": "0xF30C3ab72B1759208A1d87266023B983b7053236",
+  "newCore": "0xC4A0Ab083212D4bE28ffdFAc9456aE873fcb777d",
+  "takenAt": "2026-04-22T14:31:22.176Z",
+  "users": [
+    {
+      "user": "0x1d81AFF2A24C822D715ec09A0f81801fACe6E6Fd",
+      "totalXP": "20075",
+      "username": "Jee",
+      "usernameSet": true,
+      "tasksCompleted": "170",
+      "joinedAt": "1773832179",
+      "streakCount": "1",
+      "lastActivityDay": "20562",
+      "profileDone": true
+    },
+    {
+      "user": "0x147f83cAf63f6827a6E17549c788BB7e15848db6",
+      "totalXP": "150",
+      "username": "",
+      "usernameSet": false,
+      "tasksCompleted": "1",
+      "joinedAt": "1773832179",
+      "streakCount": "1",
+      "lastActivityDay": "20550",
+      "profileDone": false
+    },
+    {
+      "user": "0xC1D2598b2026AcBB8F92f0A8ee02aC46E0D62D48",
+      "totalXP": "100",
+      "username": "",
+      "usernameSet": false,
+      "tasksCompleted": "0",
+      "joinedAt": "1773832179",
+      "streakCount": "0",
+      "lastActivityDay": "0",
+      "profileDone": false
+    },
+    {
+      "user": "0x00E9F7BdCabFF015569a15a70CEedE8aE170824F",
+      "totalXP": "1250",
+      "username": "",
+      "usernameSet": false,
+      "tasksCompleted": "0",
+      "joinedAt": "1773832179",
+      "streakCount": "0",
+      "lastActivityDay": "0",
+      "profileDone": false
+    },
+    {
+      "user": "0xDC703CabC44458884545B897c4ca5678540c6C88",
+      "totalXP": "650",
+      "username": "",
+      "usernameSet": false,
+      "tasksCompleted": "3",
+      "joinedAt": "1773832179",
+      "streakCount": "1",
+      "lastActivityDay": "20532",
+      "profileDone": false
+    },
+    {
+      "user": "0xd5a4A77036aB305f1D40562aa81A646Cf4D592D7",
+      "totalXP": "125",
+      "username": "",
+      "usernameSet": false,
+      "tasksCompleted": "0",
+      "joinedAt": "1773832179",
+      "streakCount": "0",
+      "lastActivityDay": "0",
+      "profileDone": false
+    },
+    {
+      "user": "0xC6ef2F03C3e3AbdAf21773D1Ee070A88E0C23E23",
+      "totalXP": "275",
+      "username": "",
+      "usernameSet": false,
+      "tasksCompleted": "0",
+      "joinedAt": "1773832179",
+      "streakCount": "0",
+      "lastActivityDay": "0",
+      "profileDone": false
+    },
+    {
+      "user": "0x065695bC09fa3fa1f28becC1E8f6C3E3e0eFA0AD",
+      "totalXP": "375",
+      "username": "NoTradeOFF",
+      "usernameSet": true,
+      "tasksCompleted": "5",
+      "joinedAt": "1773937573",
+      "streakCount": "1",
+      "lastActivityDay": "20531",
+      "profileDone": true
+    },
+    {
+      "user": "0x315EED96725dFbdDeFcdF35673634CD1eCEB9433",
+      "totalXP": "50",
+      "username": "",
+      "usernameSet": false,
+      "tasksCompleted": "1",
+      "joinedAt": "1773951081",
+      "streakCount": "1",
+      "lastActivityDay": "20531",
+      "profileDone": false
+    },
+    {
+      "user": "0xFDaE6fe6013A50a84B56c978cDbe3bC516BB3E25",
+      "totalXP": "500",
+      "username": "",
+      "usernameSet": false,
+      "tasksCompleted": "6",
+      "joinedAt": "1774009977",
+      "streakCount": "1",
+      "lastActivityDay": "20532",
+      "profileDone": false
+    },
+    {
+      "user": "0xd491A9E78eb8e92CC6a1D586a584239585c2b1aa",
+      "totalXP": "200",
+      "username": "",
+      "usernameSet": false,
+      "tasksCompleted": "2",
+      "joinedAt": "1774511353",
+      "streakCount": "0",
+      "lastActivityDay": "0",
+      "profileDone": false
+    },
+    {
+      "user": "0xD232801aabfB7a94610efC4157Dbe99485c08b65",
+      "totalXP": "650",
+      "username": "Biggmohh",
+      "usernameSet": true,
+      "tasksCompleted": "11",
+      "joinedAt": "1774813953",
+      "streakCount": "4",
+      "lastActivityDay": "20550",
+      "profileDone": true
+    },
+    {
+      "user": "0xb9C65897Af2E1f188563E477822db05D4F2143f9",
+      "totalXP": "150",
+      "username": "",
+      "usernameSet": false,
+      "tasksCompleted": "2",
+      "joinedAt": "1774853905",
+      "streakCount": "1",
+      "lastActivityDay": "20542",
+      "profileDone": false
+    },
+    {
+      "user": "0xcbFF5694E3493149cCA2a10dc54ccf73e92e045e",
+      "totalXP": "5050",
+      "username": "Muhammadjon",
+      "usernameSet": true,
+      "tasksCompleted": "51",
+      "joinedAt": "1775169001",
+      "streakCount": "10",
+      "lastActivityDay": "20554",
+      "profileDone": true
+    }
+  ]
+}
