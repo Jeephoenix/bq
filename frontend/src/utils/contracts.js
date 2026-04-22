@@ -11,8 +11,14 @@ export const BASE_CHAIN_ID = 8453;
 export const BASE_RPC_URL  = import.meta.env.VITE_CDP_RPC_URL || "https://mainnet.base.org";
 
 export const CORE_ABI = [
-  "function completeGMTask() external payable",
-  "function completeDeployTask(address deployedContract) external payable",
+  "function completeGMTask(string message) external payable",
+  "function completeDeployTask(string greeting) external payable returns (address)",
+  "function lastGM(address) external view returns (string)",
+  "function lastGMAt(address) external view returns (uint256)",
+  "function lastDeployedContract(address) external view returns (address)",
+  "function deployCount(address) external view returns (uint256)",
+  "event GMPosted(address indexed user, string message, uint256 timestamp)",
+  "event ContractDeployed(address indexed user, address indexed deployed, string greeting, uint256 timestamp)",
   "function completeDeployRemix() external payable",
   "function completeSwapTask() external payable",
   "function completeBridgeTask() external payable",
@@ -185,8 +191,8 @@ export const BRIDGE_PLATFORMS = [
 ];
 
 export const TASKS = [
-  { id: "gm",       name: "GM Base",           description: "Send a GM on-chain message",           xp: 50,  ethCost: "0.00005", icon: "☀️", daily: true,  field: null },
-  { id: "deploy",   name: "Deploy Contract",    description: "Deploy a contract to Base Mainnet",    xp: 100, ethCost: "0.00005", icon: "🚀", daily: true,  field: "deployedContract", fieldLabel: "Deployed Contract Address", fieldPlaceholder: "0x...", hasSubs: true },
+  { id: "gm",       name: "GM Base",           description: "Post an on-chain GM message to Base",  xp: 50,  ethCost: "0.00005", icon: "☀️", daily: true,  field: "gmMessage", fieldLabel: "Your GM message (optional)", fieldPlaceholder: "GM Base!" },
+  { id: "deploy",   name: "Deploy Contract",    description: "Deploy a real contract to Base — done from inside the app", xp: 100, ethCost: "0.00005", icon: "🚀", daily: true,  field: "greeting", fieldLabel: "Greeting baked into your contract (optional)", fieldPlaceholder: "GM Base!", hasSubs: true },
   { id: "swap",     name: "Swap on Base",       description: "Swap on any Base DEX",                 xp: 75,  ethCost: "0.00005", icon: "🔄", daily: true,  field: null, hasSubs: true },
   { id: "basedswap",name: "BaseQuest DEX",      description: "Swap directly & earn XP multipliers",  xp: 100, ethCost: "0%",      icon: "💎", daily: false, field: null, hasSubs: false, isDEX: true },
   { id: "bridge",   name: "Bridge to Base",     description: "Bridge assets to Base",                xp: 100, ethCost: "0.00005", icon: "🌉", daily: true,  field: null, hasSubs: true },
