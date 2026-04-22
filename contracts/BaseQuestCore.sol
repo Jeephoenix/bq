@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.24;
 
 /// @title BaseQuestGreeter
 /// @notice Tiny on-chain greeter deployed by users via the GM Base / Deploy Contract quests.
