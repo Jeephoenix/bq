@@ -76,7 +76,7 @@ export default function Leaderboard({ wallet, theme, isDark }) {
           alignItems:   "center",
           gap:          "16px",
         }}>
-          <span style={{ color: "#00d4ff", fontWeight: "900", fontSize: "28px" }}>#{myRank}</span>
+          <span style={{ color: "#f1f5f9", fontWeight: "700", fontSize: "26px", letterSpacing: "-0.03em", fontVariantNumeric: "tabular-nums" }}>#{myRank}</span>
           <div>
             <div style={{ color: theme.text, fontWeight: "700", fontSize: "14px" }}>Your Rank</div>
             <div style={{ color: theme.textMuted, fontSize: "12px" }}>Keep farming to climb!</div>
@@ -185,7 +185,7 @@ export default function Leaderboard({ wallet, theme, isDark }) {
                         border:       "1px solid rgba(0,82,255,0.4)",
                         borderRadius: "20px",
                         padding:      "1px 7px",
-                        color:        "#00d4ff",
+                        color:        "#6b9fff",
                         fontSize:     "10px",
                         fontWeight:   "700",
                         flexShrink:   0,
@@ -200,7 +200,7 @@ export default function Leaderboard({ wallet, theme, isDark }) {
 
                 {/* XP */}
                 <div style={{ textAlign: "right", flexShrink: 0 }}>
-                  <div style={{ color: "#00d4ff", fontWeight: "800", fontSize: "16px" }}>
+                  <div style={{ color: "#f1f5f9", fontWeight: "600", fontSize: "15px", fontVariantNumeric: "tabular-nums" }}>
                     {formatNumber(e.xp)}
                   </div>
                   <div style={{ color: theme.textMuted, fontSize: "11px" }}>XP</div>
