@@ -113,8 +113,8 @@ export const LEVELS = [
   { level: 1, name: "Newbie",  minXP: 0,     maxXP: 499,      color: "#8892a4", emoji: "🌱" },
   { level: 2, name: "Farmer",  minXP: 500,   maxXP: 1499,     color: "#00c853", emoji: "🌾" },
   { level: 3, name: "Builder", minXP: 1500,  maxXP: 3499,     color: "#0052ff", emoji: "🔨" },
-  { level: 4, name: "Degen",   minXP: 3500,  maxXP: 7499,     color: "#a855f7", emoji: "⚡" },
-  { level: 5, name: "OG Base", minXP: 7500,  maxXP: 14999,    color: "#00d4ff", emoji: "🔥" },
+  { level: 4, name: "Degen",   minXP: 3500,  maxXP: 7499,     color: "#6b9fff", emoji: "⚡" },
+  { level: 5, name: "OG Base", minXP: 7500,  maxXP: 14999,    color: "#f1f5f9", emoji: "🔥" },
   { level: 6, name: "Phoenix", minXP: 15000, maxXP: Infinity,  color: "#f0b429", emoji: "🦅" },
 ];
 
