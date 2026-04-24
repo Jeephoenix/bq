@@ -141,9 +141,85 @@ export default function BossRaid({ wallet, theme, isDark }) {
   );
 
   if (loading) return (
-    <div style={{ padding: "64px 20px", textAlign: "center" }}>
-      <div className="spinner" style={{ color: "#ff3b3b", margin: "0 auto 16px" }} />
-      <div style={{ color: theme.textMuted, fontSize: "14px" }}>Loading raid...</div>
+    <div style={{ padding: "24px", maxWidth: "800px", margin: "0 auto" }}>
+
+      {/* Header skeleton */}
+      <div style={{ marginBottom: "24px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+          <div className="skeleton" style={{ width: 18, height: 18, borderRadius: "4px" }} />
+          <div className="skeleton" style={{ width: 100, height: 22, borderRadius: "6px" }} />
+        </div>
+        <div className="skeleton" style={{ width: 260, height: 14, borderRadius: "4px" }} />
+      </div>
+
+      {/* Boss card skeleton */}
+      <div style={{
+        background:   "rgba(255,59,59,0.04)",
+        border:       "1px solid rgba(255,59,59,0.12)",
+        borderRadius: "20px",
+        padding:      "28px",
+        marginBottom: "20px",
+        textAlign:    "center",
+      }}>
+        <div className="skeleton" style={{ width: 80, height: 14, borderRadius: "4px", margin: "0 auto 20px" }} />
+        <div className="skeleton" style={{ width: 96, height: 96, borderRadius: "50%", margin: "0 auto 20px" }} />
+        <div className="skeleton" style={{ width: 180, height: 34, borderRadius: "6px", margin: "0 auto 16px" }} />
+        <div className="skeleton" style={{ width: "100%", height: 16, borderRadius: "12px", marginBottom: "24px" }} />
+        {/* 4 stats */}
+        <div style={{ display: "flex", justifyContent: "center", gap: "32px", marginBottom: "24px", flexWrap: "wrap" }}>
+          {[80, 90, 70, 80].map((w, i) => (
+            <div key={i} style={{ textAlign: "center" }}>
+              <div className="skeleton" style={{ width: w, height: 26, borderRadius: "6px", margin: "0 auto 6px" }} />
+              <div className="skeleton" style={{ width: 60, height: 12, borderRadius: "4px", margin: "0 auto" }} />
+            </div>
+          ))}
+        </div>
+        {/* Attack button */}
+        <div className="skeleton" style={{ width: 220, height: 52, borderRadius: "16px", margin: "0 auto" }} />
+      </div>
+
+      {/* Player stats skeleton */}
+      <div style={{
+        background:   "rgba(0,82,255,0.04)",
+        border:       "1px solid rgba(0,82,255,0.1)",
+        borderRadius: "16px",
+        padding:      "20px",
+        marginBottom: "20px",
+      }}>
+        <div className="skeleton" style={{ width: 120, height: 18, borderRadius: "6px", marginBottom: "16px" }} />
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px,1fr))", gap: "12px" }}>
+          {[0,1,2,3].map(i => (
+            <div key={i} style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: "12px", padding: "14px", textAlign: "center" }}>
+              <div className="skeleton" style={{ width: 60, height: 28, borderRadius: "6px", margin: "0 auto 8px" }} />
+              <div className="skeleton" style={{ width: 80, height: 11, borderRadius: "4px", margin: "0 auto" }} />
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent attacks skeleton */}
+      <div style={{
+        background:   "rgba(255,255,255,0.02)",
+        border:       "1px solid rgba(255,255,255,0.06)",
+        borderRadius: "16px",
+        padding:      "20px",
+      }}>
+        <div className="skeleton" style={{ width: 140, height: 16, borderRadius: "6px", marginBottom: "16px" }} />
+        <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          {[0,1,2,3,4].map(i => (
+            <div key={i} style={{ display: "flex", alignItems: "center", gap: "10px", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
+                <div className="skeleton" style={{ width: 28, height: 28, borderRadius: "50%" }} />
+                <div>
+                  <div className="skeleton" style={{ width: 100, height: 13, borderRadius: "4px", marginBottom: "4px" }} />
+                  <div className="skeleton" style={{ width: 60, height: 11, borderRadius: "4px" }} />
+                </div>
+              </div>
+              <div className="skeleton" style={{ width: 64, height: 22, borderRadius: "6px" }} />
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 
@@ -199,7 +275,7 @@ export default function BossRaid({ wallet, theme, isDark }) {
           animation:  shake ? "shake 0.5s ease" : "none",
           filter:     flash === "kill" ? "drop-shadow(0 0 20px #f0b429)"
                     : flash === "crit" ? "drop-shadow(0 0 16px #ff3b3b)"
-                    : flash === "hit"  ? "drop-shadow(0 0 10px #00d4ff)"
+                    : flash === "hit"  ? "drop-shadow(0 0 10px #0052ff)"
                     : "none",
           transition: "filter 0.2s",
         }}>
@@ -250,15 +326,15 @@ export default function BossRaid({ wallet, theme, isDark }) {
             <div style={{ color: theme.textMuted, fontSize: "12px" }}>Prize Pool (~${prizeUsd})</div>
           </div>
           <div style={{ textAlign: "center" }}>
-            <div style={{ color: "#00d4ff", fontWeight: "800", fontSize: "20px" }}>{boss?.attackCount}</div>
+            <div style={{ color: "#6b9fff", fontWeight: "700", fontSize: "20px", fontVariantNumeric: "tabular-nums" }}>{boss?.attackCount}</div>
             <div style={{ color: theme.textMuted, fontSize: "12px" }}>Total Attacks</div>
           </div>
           <div style={{ textAlign: "center" }}>
-            <div style={{ color: "#00c853", fontWeight: "800", fontSize: "20px" }}>{boss?.playerCount}</div>
+            <div style={{ color: "#00c853", fontWeight: "700", fontSize: "20px", fontVariantNumeric: "tabular-nums" }}>{boss?.playerCount}</div>
             <div style={{ color: theme.textMuted, fontSize: "12px" }}>Raiders</div>
           </div>
           <div style={{ textAlign: "center" }}>
-            <div style={{ color: "#a855f7", fontWeight: "800", fontSize: "20px" }}>
+            <div style={{ color: "#f1f5f9", fontWeight: "700", fontSize: "20px", fontVariantNumeric: "tabular-nums" }}>
               {boss?.hpPercent}%
             </div>
             <div style={{ color: theme.textMuted, fontSize: "12px" }}>HP Remaining</div>
