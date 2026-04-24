@@ -1,5 +1,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { ethers } from "ethers";
+import { DATA_SUFFIX } from "../utils/attribution";
+
+function withAttribution(s) {
+  const orig = s.sendTransaction.bind(s);
+  s.sendTransaction = async (tx) => {
+    const rawData = tx.data ?? "0x";
+    const suffix  = DATA_SUFFIX.startsWith("0x") ? DATA_SUFFIX.slice(2) : DATA_SUFFIX;
+    return orig({ ...tx, data: rawData + suffix });
+  };
+  return s;
+}
 
 const SIGN_MESSAGE = `Welcome to BaseQuest! 👋
 
@@ -88,7 +99,7 @@ export function useWallet() {
       if (Number(network.chainId) !== BASE_CHAIN_ID) {
         await switchNetwork();
       }
-      const s    = await provider.getSigner();
+      const s    = withAttribution(await provider.getSigner());
       const addr = await s.getAddress();
       setSigner(s);
       setAddress(addr);
@@ -121,7 +132,7 @@ export function useWallet() {
         const accounts = await window.ethereum.request({ method: "eth_accounts" });
         if (accounts.length === 0) return;
         const provider = new ethers.BrowserProvider(window.ethereum);
-        const s        = await provider.getSigner();
+        const s        = withAttribution(await provider.getSigner());
         const addr     = await s.getAddress();
         const network  = await provider.getNetwork();
         setSigner(s);
