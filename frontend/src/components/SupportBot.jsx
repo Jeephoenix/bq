@@ -155,14 +155,14 @@ export default function SupportBot() {
           width:          "52px",
           height:         "52px",
           borderRadius:   "50%",
-          background:     "linear-gradient(135deg, #0052ff, #7c3aed)",
+          background:     "#0052ff",
           border:         "none",
           cursor:         "pointer",
           display:        "flex",
           alignItems:     "center",
           justifyContent: "center",
-          fontSize:       "22px",
-          boxShadow:      "0 4px 20px rgba(0,82,255,0.5)",
+          fontSize:       "20px",
+          boxShadow:      "0 4px 16px rgba(0,82,255,0.35)",
           transition:     "all 0.3s",
         }}
       >
@@ -189,7 +189,7 @@ export default function SupportBot() {
 
           {/* Header */}
           <div style={{
-            background:   "linear-gradient(135deg, #0a0f2e, #1a0a3e)",
+            background:   "#0d0f1a",
             padding:      "14px 16px",
             display:      "flex",
             alignItems:   "center",
@@ -201,11 +201,11 @@ export default function SupportBot() {
               width:          "36px",
               height:         "36px",
               borderRadius:   "50%",
-              background:     "linear-gradient(135deg, #0052ff, #7c3aed)",
+              background:     "#0052ff",
               display:        "flex",
               alignItems:     "center",
               justifyContent: "center",
-              fontSize:       "18px",
+              fontSize:       "16px",
               flexShrink:     0,
             }}>🤖</div>
             <div style={{ flex: 1 }}>
@@ -250,7 +250,7 @@ export default function SupportBot() {
                     width:          "28px",
                     height:         "28px",
                     borderRadius:   "50%",
-                    background:     "linear-gradient(135deg, #0052ff, #7c3aed)",
+                    background:     "#0052ff",
                     display:        "flex",
                     alignItems:     "center",
                     justifyContent: "center",
@@ -261,7 +261,7 @@ export default function SupportBot() {
                 <div style={{
                   maxWidth:     "80%",
                   background:   msg.role === "user"
-                    ? "linear-gradient(135deg, #0052ff, #7c3aed)"
+                    ? "#0052ff"
                     : "rgba(255,255,255,0.06)",
                   border:       msg.role === "user"
                     ? "none"
@@ -283,7 +283,7 @@ export default function SupportBot() {
               <div style={{ display: "flex", justifyContent: "flex-start", alignItems: "flex-end", gap: "8px" }}>
                 <div style={{
                   width: "28px", height: "28px", borderRadius: "50%",
-                  background: "linear-gradient(135deg, #0052ff, #7c3aed)",
+                  background: "#0052ff",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: "14px", flexShrink: 0,
                 }}>🤖</div>
@@ -374,7 +374,7 @@ export default function SupportBot() {
               style={{
                 background:   loading || !input.trim()
                   ? "rgba(0,82,255,0.3)"
-                  : "linear-gradient(135deg, #0052ff, #7c3aed)",
+                  : "#0052ff",
                 border:       "none",
                 borderRadius: "10px",
                 padding:      "10px 16px",
