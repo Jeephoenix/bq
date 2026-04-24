@@ -44,7 +44,7 @@ export default function QuestBoard({ quests, wallet, theme, isDark }) {
   const {
     completeTask, getTaskStatus, getSubTaskStatus,
     txPending, lastTx, error, userProfile,
-    completedCount, totalDaily,
+    completedCount, totalDaily, loading,
   } = quests;
 
   const [fieldValues,   setFieldValues]   = useState({});
@@ -227,6 +227,67 @@ export default function QuestBoard({ quests, wallet, theme, isDark }) {
     </div>
   );
 
+  if (loading) return (
+    <div style={{ padding: "24px 0" }}>
+
+      {/* Header skeleton */}
+      <div style={{ marginBottom: "24px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+          <div className="skeleton" style={{ width: 18, height: 18, borderRadius: "4px" }} />
+          <div className="skeleton" style={{ width: 110, height: 22, borderRadius: "6px" }} />
+        </div>
+        <div className="skeleton" style={{ width: 240, height: 14, borderRadius: "4px" }} />
+      </div>
+
+      {/* DEX banner skeleton */}
+      <div style={{
+        background:   "rgba(0,82,255,0.04)",
+        border:       "1px solid rgba(0,82,255,0.12)",
+        borderRadius: "20px",
+        padding:      "24px 20px",
+        marginBottom: "20px",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "14px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div className="skeleton" style={{ width: 52, height: 52, borderRadius: "12px" }} />
+            <div>
+              <div className="skeleton" style={{ width: 160, height: 20, borderRadius: "6px", marginBottom: "6px" }} />
+              <div className="skeleton" style={{ width: 200, height: 13, borderRadius: "4px" }} />
+            </div>
+          </div>
+          <div>
+            <div className="skeleton" style={{ width: 80, height: 28, borderRadius: "6px", marginBottom: "4px" }} />
+            <div className="skeleton" style={{ width: 50, height: 11, borderRadius: "4px" }} />
+          </div>
+        </div>
+        <div className="skeleton" style={{ width: "100%", height: 48, borderRadius: "12px" }} />
+      </div>
+
+      {/* Quest card skeletons */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+        {[200, 160, 180, 170, 160, 175].map((h, i) => (
+          <div key={i} style={{
+            background:   "rgba(255,255,255,0.02)",
+            border:       "1px solid rgba(255,255,255,0.06)",
+            borderRadius: "14px",
+            padding:      "16px 18px",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div className="skeleton" style={{ width: 42, height: 42, borderRadius: "10px" }} />
+                <div>
+                  <div className="skeleton" style={{ width: 130, height: 16, borderRadius: "5px", marginBottom: "6px" }} />
+                  <div className="skeleton" style={{ width: 180, height: 12, borderRadius: "4px" }} />
+                </div>
+              </div>
+              <div className="skeleton" style={{ width: 64, height: 30, borderRadius: "8px" }} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   return (
     <div style={{ padding: "24px 0" }}>
 
@@ -272,7 +333,7 @@ export default function QuestBoard({ quests, wallet, theme, isDark }) {
           left:         "-40px",
           width:        "150px",
           height:       "150px",
-          background:   "radial-gradient(circle, rgba(168,85,247,0.2) 0%, transparent 70%)",
+          background:   "radial-gradient(circle, rgba(0,82,255,0.15) 0%, transparent 70%)",
           borderRadius: "50%",
           pointerEvents:"none",
         }} />
@@ -286,20 +347,22 @@ export default function QuestBoard({ quests, wallet, theme, isDark }) {
               display:        "flex",
               alignItems:     "center",
               justifyContent: "center",
-              background:     "linear-gradient(135deg, rgba(0,82,255,0.4), rgba(168,85,247,0.4))",
-              borderRadius:   "14px",
-              border:         "1px solid rgba(0,82,255,0.5)",
+              background:     "rgba(0,82,255,0.12)",
+              borderRadius:   "12px",
+              border:         "1px solid rgba(0,82,255,0.2)",
             }}><DiamondIcon size={24} style={{ color: "white" }} /></div>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
                 <span style={{ color: "white", fontSize: "18px", fontWeight: "900" }}>BaseQuest DEX</span>
                 <span style={{
-                  background:   "linear-gradient(135deg, #0052ff, #a855f7)",
-                  borderRadius: "20px",
-                  padding:      "2px 10px",
-                  color:        "white",
+                  background:   "rgba(0,82,255,0.15)",
+                  border:       "1px solid rgba(0,82,255,0.25)",
+                  borderRadius: "5px",
+                  padding:      "2px 8px",
+                  color:        "#6b9fff",
                   fontSize:     "10px",
-                  fontWeight:   "800",
+                  fontWeight:   "600",
+                  letterSpacing: "0.04em",
                 }}>EXCLUSIVE</span>
               </div>
               <div style={{ color: "#8892a4", fontSize: "12px", marginTop: "2px" }}>
@@ -343,7 +406,7 @@ export default function QuestBoard({ quests, wallet, theme, isDark }) {
           ))}
           {multiplier > 1 && (
             <div style={{
-              background:   "linear-gradient(135deg, rgba(240,180,41,0.2), rgba(168,85,247,0.2))",
+              background:   "rgba(240,180,41,0.12)",
               border:       "1px solid rgba(240,180,41,0.4)",
               borderRadius: "20px",
               padding:      "4px 10px",
@@ -388,15 +451,15 @@ export default function QuestBoard({ quests, wallet, theme, isDark }) {
           onClick={() => setShowDEX(!showDEX)}
           style={{
             width:        "100%",
-            background:   showDEX ? "rgba(0,82,255,0.15)" : "linear-gradient(135deg, #0052ff, #7c3aed)",
-            border:       showDEX ? "1px solid rgba(0,82,255,0.4)" : "none",
+            background:   showDEX ? "rgba(255,255,255,0.05)" : "#0052ff",
+            border:       showDEX ? "1px solid rgba(255,255,255,0.1)" : "none",
             borderRadius: "12px",
             padding:      "14px",
             color:        "white",
             fontWeight:   "600",
             fontSize:     "14px",
             cursor:       "pointer",
-            boxShadow:    showDEX ? "none" : "0 4px 24px rgba(0,82,255,0.4)",
+            boxShadow:    "none",
             transition:   "all 0.2s",
             display:      "flex",
             alignItems:   "center",
@@ -509,8 +572,8 @@ export default function QuestBoard({ quests, wallet, theme, isDark }) {
                     <span style={{ color: theme.text, fontWeight: "700", fontSize: "15px" }}>{task.name}</span>
                     {isDone      && <span style={{ background: "rgba(0,200,83,0.2)",   color: "#00c853", fontSize: "11px", fontWeight: "700", padding: "2px 8px", borderRadius: "20px" }}>DONE</span>}
                     {isAuto      && <span style={{ background: "rgba(240,180,41,0.2)", color: "#f0b429", fontSize: "11px", fontWeight: "700", padding: "2px 8px", borderRadius: "20px" }}>AUTO</span>}
-                    {task.oneTime && !isDone && <span style={{ background: "rgba(168,85,247,0.2)", color: "#a855f7", fontSize: "11px", fontWeight: "700", padding: "2px 8px", borderRadius: "20px" }}>ONE-TIME</span>}
-                    {task.hasSubs && !isDone && <span style={{ background: "rgba(0,82,255,0.2)",   color: "#00d4ff", fontSize: "11px", fontWeight: "700", padding: "2px 8px", borderRadius: "20px" }}>+BONUS XP</span>}
+                    {task.oneTime && !isDone && <span style={{ background: "rgba(255,255,255,0.06)", color: "#8892a4", fontSize: "10px", fontWeight: "600", padding: "2px 7px", borderRadius: "4px", letterSpacing: "0.04em" }}>ONE-TIME</span>}
+                    {task.hasSubs && !isDone && <span style={{ background: "rgba(0,82,255,0.12)", color: "#6b9fff", fontSize: "10px", fontWeight: "600", padding: "2px 7px", borderRadius: "4px", letterSpacing: "0.04em" }}>+BONUS XP</span>}
                   </div>
                   <div style={{ color: theme.textMuted, fontSize: "13px", marginTop: "2px" }}>{task.description}</div>
                 </div>
