@@ -136,7 +136,7 @@ export default function BridgeTracker({ wallet, theme }) {
             onClick={track}
             disabled={loading}
             style={{
-              background: loading ? "rgba(0,200,83,0.2)" : "linear-gradient(135deg, #00c853, #00d4ff)",
+              background: loading ? "rgba(0,200,83,0.3)" : "#00c853",
               border: "none", borderRadius: "10px", padding: "10px 20px",
               color: "white", fontWeight: "600", fontSize: "13px",
               cursor: loading ? "not-allowed" : "pointer",
