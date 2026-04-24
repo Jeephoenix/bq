@@ -8,8 +8,8 @@ import { TrendingUpIcon, GiftIcon, ScanIcon, LayersIcon, SearchIcon } from "./Ic
 
 const TOOLS = [
   { id: "defi",     label: "DeFi Yield",      Icon: TrendingUpIcon, color: "#0052ff",  desc: "Top Base pools" },
-  { id: "airdrop",  label: "Airdrop Checker",  Icon: GiftIcon,       color: "#a855f7",  desc: "Eligibility scan" },
-  { id: "scanner",  label: "Contract Scanner", Icon: ScanIcon,       color: "#00d4ff",  desc: "Risk summary" },
+  { id: "airdrop",  label: "Airdrop Checker",  Icon: GiftIcon,       color: "#0052ff",  desc: "Eligibility scan" },
+  { id: "scanner",  label: "Contract Scanner", Icon: ScanIcon,       color: "#0052ff",  desc: "Risk summary" },
   { id: "bridges",  label: "Bridge Tracker",   Icon: LayersIcon,     color: "#00c853",  desc: "Bridge history" },
   { id: "analyzer", label: "Wallet Analyzer",  Icon: SearchIcon,     color: "#f59e0b",  desc: "Base score" },
 ];
