@@ -974,7 +974,7 @@ export default function BasedSwapDEX({ wallet, userProfile }) {
             width:        "100%",
             background:   !quote || isBusy
               ? "rgba(0,82,255,0.3)"
-              : "linear-gradient(135deg, #0052ff, #7c3aed)",
+              : "#0052ff",
             border:       "none",
             borderRadius: "12px",
             padding:      "14px",
@@ -1010,7 +1010,7 @@ export default function BasedSwapDEX({ wallet, userProfile }) {
               <div style={{ color: "#8892a4", fontSize: "11px", marginTop: "2px" }}>XP Earned</div>
             </div>
             <div style={{ textAlign: "center" }}>
-              <div style={{ color: "#00d4ff", fontSize: "20px", fontWeight: "900" }}>{userStats.totalVolumeETH}</div>
+              <div style={{ color: "#f1f5f9", fontSize: "20px", fontWeight: "700", fontVariantNumeric: "tabular-nums" }}>{userStats.totalVolumeETH}</div>
               <div style={{ color: "#8892a4", fontSize: "11px", marginTop: "2px" }}>ETH Volume</div>
               {toUSD(userStats.totalVolumeETH, NATIVE) && (
                 <div style={{ color: "#8892a4", fontSize: "10px" }}>
