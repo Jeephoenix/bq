@@ -106,7 +106,7 @@ export default function ContractScanner({ theme }) {
     <div style={{ paddingTop: "24px" }}>
       <div style={{ marginBottom: "20px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "4px" }}>
-          <ScanIcon size={20} style={{ color: "#00d4ff" }} />
+          <ScanIcon size={20} style={{ color: "#0052ff" }} />
           <span style={{ fontSize: "20px", fontWeight: "700", color: theme.text, letterSpacing: "-0.3px" }}>Contract Scanner</span>
         </div>
         <div style={{ fontSize: "13px", color: theme.textMuted }}>
@@ -135,12 +135,12 @@ export default function ContractScanner({ theme }) {
             onClick={scan}
             disabled={loading}
             style={{
-              background: loading ? "rgba(0,212,255,0.2)" : "linear-gradient(135deg, #0052ff, #00d4ff)",
+              background: loading ? "rgba(0,82,255,0.3)" : "#0052ff",
               border: "none", borderRadius: "10px", padding: "10px 20px",
               color: "white", fontWeight: "600", fontSize: "13px",
               cursor: loading ? "not-allowed" : "pointer",
               display: "flex", alignItems: "center", gap: "7px", fontFamily: "inherit",
-              boxShadow: loading ? "none" : "0 4px 16px rgba(0,82,255,0.3)",
+              boxShadow: "none",
               whiteSpace: "nowrap",
             }}
           >
