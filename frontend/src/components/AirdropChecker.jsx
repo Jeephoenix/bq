@@ -275,7 +275,7 @@ export default function AirdropChecker({ wallet, theme }) {
             onClick={check}
             disabled={loading}
             style={{
-              background: loading ? "rgba(168,85,247,0.3)" : "linear-gradient(135deg, #7c3aed, #a855f7)",
+              background: loading ? "rgba(0,82,255,0.3)" : "#0052ff",
               border: "none", borderRadius: "10px", padding: "10px 20px",
               color: "white", fontWeight: "600", fontSize: "13px",
               cursor: loading ? "not-allowed" : "pointer",
