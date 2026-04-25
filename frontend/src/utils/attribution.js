@@ -1,5 +1,5 @@
 import { Attribution } from "ox/erc8021";
 
 export const DATA_SUFFIX = Attribution.toDataSuffix({
-  codes: [""],
+  codes: ["bc_YOUR_NEW_CODE_HERE"],
 });
