@@ -119,14 +119,15 @@ export default function ContractScanner({ theme }) {
         <div style={{ fontSize: "12px", color: theme.textMuted, fontWeight: "600", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.6px" }}>
           Contract Address
         </div>
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
           <input
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === "Enter" && scan()}
             placeholder="0x..."
             style={{
-              flex: 1, background: "rgba(0,0,0,0.2)", border: `1px solid ${theme.border}`,
+              flex: "1 1 180px", minWidth: 0,
+              background: "rgba(0,0,0,0.2)", border: `1px solid ${theme.border}`,
               borderRadius: "10px", padding: "10px 14px", color: theme.text,
               fontSize: "13px", fontFamily: "monospace", outline: "none",
             }}
