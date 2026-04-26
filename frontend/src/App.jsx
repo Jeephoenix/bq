@@ -12,6 +12,7 @@ import SupportBot           from "./components/SupportBot";
 import PrivacyPolicy        from "./components/PrivacyPolicy";
 import OnboardingIntro      from "./components/OnboardingIntro";
 import ToastContainer       from "./components/ToastContainer";
+import WhatsNewToast        from "./components/WhatsNewToast";
 import {
   HomeIcon, MapIcon, SwordIcon, TrophyIcon, WrenchIcon,
   LockIcon, CheckIcon, AlertIcon,
@@ -480,6 +481,7 @@ export default function App() {
 
       <SupportBot />
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
+      <WhatsNewToast theme={theme} />
 
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
