@@ -143,31 +143,33 @@ export default function SupportBot() {
 
   return (
     <>
-      {/* Floating button */}
-      <button
-        onClick={() => setOpen(!open)}
-        className={open ? "support-bot-btn-open" : "support-bot-btn-closed"}
-        style={{
-          position:       "fixed",
-          bottom:         open ? "450px" : "80px",
-          right:          "16px",
-          zIndex:         200,
-          width:          "52px",
-          height:         "52px",
-          borderRadius:   "50%",
-          background:     "#0052ff",
-          border:         "none",
-          cursor:         "pointer",
-          display:        "flex",
-          alignItems:     "center",
-          justifyContent: "center",
-          fontSize:       "20px",
-          boxShadow:      "0 4px 16px rgba(0,82,255,0.35)",
-          transition:     "all 0.3s",
-        }}
-      >
-        {open ? "✕" : "💬"}
-      </button>
+      {/* Floating button (hidden while chat is open — header has its own close ✕) */}
+      {!open && (
+        <button
+          onClick={() => setOpen(true)}
+          className="support-bot-btn-closed"
+          style={{
+            position:       "fixed",
+            bottom:         "80px",
+            right:          "16px",
+            zIndex:         200,
+            width:          "52px",
+            height:         "52px",
+            borderRadius:   "50%",
+            background:     "#0052ff",
+            border:         "none",
+            cursor:         "pointer",
+            display:        "flex",
+            alignItems:     "center",
+            justifyContent: "center",
+            fontSize:       "20px",
+            boxShadow:      "0 4px 16px rgba(0,82,255,0.35)",
+            transition:     "all 0.3s",
+          }}
+        >
+          💬
+        </button>
+      )}
 
       {/* Chat window */}
       {open && (
