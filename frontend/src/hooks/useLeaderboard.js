@@ -10,6 +10,7 @@ export function useLeaderboard(currentAddress, refreshInterval = 60000) {
   const [myRank,      setMyRank]      = useState(null);
 
   const fetchLeaderboard = useCallback(async () => {
+    setLoading(true);
     try {
       const provider = getReadProvider();
       const core     = getCoreContract(provider);
