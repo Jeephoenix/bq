@@ -42,6 +42,17 @@ const theme = {
 
 export default function App() {
   const [activeTab,      setActiveTab]      = useState("dashboard");
+  const [toolsVisited,   setToolsVisited]   = useState(
+    () => typeof window !== "undefined" && Boolean(localStorage.getItem("bq_tools_seen"))
+  );
+
+  const handleSetActiveTab = useCallback((tabId) => {
+    setActiveTab(tabId);
+    if (tabId === "tools" && !toolsVisited) {
+      localStorage.setItem("bq_tools_seen", "1");
+      setToolsVisited(true);
+    }
+  }, [toolsVisited]);
   const [showPrivacy,    setShowPrivacy]    = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("bq_onboarded"));
   const [toasts,         setToasts]         = useState([]);
@@ -264,15 +275,16 @@ export default function App() {
         <div style={{ display: "flex", maxWidth: "1100px", margin: "0 auto", padding: "0 20px" }}>
           {TABS.map(tab => {
             const active = activeTab === tab.id;
+            const showPulse = tab.id === "tools" && !toolsVisited && !active;
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleSetActiveTab(tab.id)}
                 style={{
                   background: "none", border: "none",
                   borderBottom: active ? "2px solid #0052ff" : "2px solid transparent",
                   padding: "13px 16px",
-                  color: active ? "#f1f5f9" : "#64748b",
+                  color: active ? "#f1f5f9" : showPulse ? "#0052ff" : "#64748b",
                   fontWeight: active ? "600" : "400",
                   fontSize: "13px",
                   cursor: "pointer",
@@ -281,9 +293,10 @@ export default function App() {
                   display: "flex", alignItems: "center", gap: "7px",
                   fontFamily: "inherit",
                   letterSpacing: "-0.01em",
+                  position: "relative",
                 }}
-                onMouseEnter={e => { if (!active) e.currentTarget.style.color = "#c1c9d6"; }}
-                onMouseLeave={e => { if (!active) e.currentTarget.style.color = "#64748b"; }}
+                onMouseEnter={e => { if (!active && !showPulse) e.currentTarget.style.color = "#c1c9d6"; }}
+                onMouseLeave={e => { if (!active && !showPulse) e.currentTarget.style.color = "#64748b"; }}
               >
                 <tab.Icon size={14} />
                 {tab.label}
@@ -295,6 +308,14 @@ export default function App() {
                     color: "#ff6b6b", fontSize: "9px", fontWeight: "700",
                     letterSpacing: "0.06em",
                   }}>LIVE</span>
+                )}
+                {showPulse && (
+                  <span style={{
+                    position: "absolute", top: "9px", right: "8px",
+                    width: "6px", height: "6px",
+                    background: "#0052ff", borderRadius: "50%",
+                    animation: "tab-pulse 1.8s ease-in-out infinite",
+                  }} />
                 )}
               </button>
             );
@@ -439,13 +460,14 @@ export default function App() {
         <div style={{ display: "flex", padding: "4px 0" }}>
           {TABS.map(tab => {
             const active = activeTab === tab.id;
+            const showPulse = tab.id === "tools" && !toolsVisited && !active;
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleSetActiveTab(tab.id)}
                 style={{
                   flex: 1, background: "none", border: "none",
-                  color: active ? "#0052ff" : "#64748b",
+                  color: active ? "#0052ff" : showPulse ? "#0052ff" : "#64748b",
                   cursor: "pointer",
                   display: "flex", flexDirection: "column", alignItems: "center", gap: "3px",
                   padding: "10px 4px",
@@ -473,6 +495,14 @@ export default function App() {
                     background: "#ff3b3b", borderRadius: "50%",
                   }} />
                 )}
+                {showPulse && (
+                  <span style={{
+                    position: "absolute", top: "8px", right: "calc(50% - 18px)",
+                    width: "7px", height: "7px",
+                    background: "#0052ff", borderRadius: "50%",
+                    animation: "tab-pulse 1.8s ease-in-out infinite",
+                  }} />
+                )}
               </button>
             );
           })}
@@ -484,6 +514,10 @@ export default function App() {
       <WhatsNewToast theme={theme} />
 
       <style>{`
+        @keyframes tab-pulse {
+          0%, 100% { transform: scale(1);   box-shadow: 0 0 0 0   rgba(0,82,255,0.5); }
+          50%      { transform: scale(1.2); box-shadow: 0 0 0 6px rgba(0,82,255,0); }
+        }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #0a0b0f; font-family: 'Inter', sans-serif; }
         input, button, textarea { font-family: 'Inter', sans-serif; }
