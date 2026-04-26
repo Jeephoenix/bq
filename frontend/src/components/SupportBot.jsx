@@ -90,6 +90,9 @@ Keep your answers short, friendly and helpful. Use emojis where appropriate. If 
 
 export default function SupportBot() {
   const [open,     setOpen]     = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(
+    () => typeof window !== "undefined" && Boolean(localStorage.getItem("bq_supportbot_seen"))
+  );
   const [messages, setMessages] = useState([
     {
       role:    "assistant",
@@ -146,7 +149,13 @@ export default function SupportBot() {
       {/* Floating button (hidden while chat is open — header has its own close ✕) */}
       {!open && (
         <button
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            setOpen(true);
+            if (!hasInteracted) {
+              localStorage.setItem("bq_supportbot_seen", "1");
+              setHasInteracted(true);
+            }
+          }}
           className="support-bot-btn-closed"
           style={{
             position:       "fixed",
@@ -165,11 +174,18 @@ export default function SupportBot() {
             fontSize:       "20px",
             boxShadow:      "0 4px 16px rgba(0,82,255,0.35)",
             transition:     "all 0.3s",
+            animation:      hasInteracted ? "none" : "supportbot-pulse 2s ease-in-out infinite",
           }}
         >
           💬
         </button>
       )}
+      <style>{`
+        @keyframes supportbot-pulse {
+          0%, 100% { box-shadow: 0 4px 16px rgba(0,82,255,0.35), 0 0 0 0 rgba(0,82,255,0.5); }
+          50%      { box-shadow: 0 4px 16px rgba(0,82,255,0.55), 0 0 0 14px rgba(0,82,255,0); }
+        }
+      `}</style>
 
       {/* Chat window */}
       {open && (
