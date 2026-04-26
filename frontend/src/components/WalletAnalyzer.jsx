@@ -108,7 +108,7 @@ export default function WalletAnalyzer({ wallet, theme, isDark }) {
         <label style={{ color: theme.textMuted, fontSize: "12px", fontWeight: "600", display: "block", marginBottom: "8px" }}>
           Wallet Address
         </label>
-        <div style={{ display: "flex", gap: "10px" }}>
+        <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
           <input
             type="text"
             placeholder="0x..."
@@ -116,7 +116,8 @@ export default function WalletAnalyzer({ wallet, theme, isDark }) {
             onChange={e => setInputAddress(e.target.value)}
             onKeyDown={e => e.key === "Enter" && handleAnalyze()}
             style={{
-              flex:         1,
+              flex:         "1 1 180px",
+              minWidth:     0,
               background:   isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.04)",
               border:       `1px solid ${theme.border}`,
               borderRadius: "10px",
