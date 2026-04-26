@@ -59,7 +59,7 @@ export default function Leaderboard({ wallet, theme, isDark }) {
             fontFamily:   "inherit",
           }}
         >
-          <RefreshIcon size={13} />
+          <RefreshIcon size={13} style={{ animation: loading ? "spin 1s linear infinite" : "none" }} />
           {loading ? "Loading..." : "Refresh"}
         </button>
       </div>
@@ -210,6 +210,7 @@ export default function Leaderboard({ wallet, theme, isDark }) {
           })}
         </div>
       )}
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
                                     }
