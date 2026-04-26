@@ -349,6 +349,7 @@ export default function SupportBot() {
             gap:        "8px",
             flexShrink: 0,
             background: "#0d0e14",
+            flexWrap:   "wrap",
           }}>
             <input
               type="text"
@@ -358,7 +359,8 @@ export default function SupportBot() {
               onKeyDown={handleKey}
               disabled={loading}
               style={{
-                flex:         1,
+                flex:         "1 1 180px",
+                minWidth:     0,
                 background:   "rgba(255,255,255,0.05)",
                 border:       "1px solid rgba(255,255,255,0.1)",
                 borderRadius: "10px",
