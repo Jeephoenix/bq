@@ -7,6 +7,7 @@ export function useLeaderboard(currentAddress, refreshInterval = 60000) {
   const [error,       setError]       = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [totalUsers,  setTotalUsers]  = useState(0);
+  const [myRank,      setMyRank]      = useState(null);
 
   const fetchLeaderboard = useCallback(async () => {
     try {
@@ -55,7 +56,12 @@ export function useLeaderboard(currentAddress, refreshInterval = 60000) {
         .sort((a, b) => b.xp - a.xp)
         .map((e, i) => ({ ...e, rank: i + 1 }));
 
-      setEntries(sorted);
+      const myEntry = currentAddress
+        ? sorted.find(e => e.isCurrentUser)
+        : null;
+      setMyRank(myEntry ? myEntry.rank : null);
+
+      setEntries(sorted.slice(0, 10));
       setLastUpdated(new Date());
       setError(null);
     } catch (err) {
@@ -71,6 +77,5 @@ export function useLeaderboard(currentAddress, refreshInterval = 60000) {
     return () => clearInterval(interval);
   }, [fetchLeaderboard, refreshInterval]);
 
-  const myRank = currentAddress ? (entries.find(e => e.isCurrentUser)?.rank ?? null) : null;
   return { entries, loading, error, lastUpdated, totalUsers, myRank, refresh: fetchLeaderboard };
 }
