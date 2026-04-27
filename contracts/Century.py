@@ -4,17 +4,16 @@ from genlayer import *
 import json
 import hashlib
 
-# 1. Added @allow_storage to all dataclasses
 @allow_storage
 @dataclass
 class Player:
     address: str
-    xp: int
-    streak: int
-    games_played: int
-    correct_votes: int
-    successful_bluffs: int
-    successful_appeals: int
+    xp: u256  # Changed int to u256
+    streak: u256
+    games_played: u256
+    correct_votes: u256
+    successful_bluffs: u256
+    successful_appeals: u256
     badge: str
 
 @allow_storage
@@ -23,7 +22,7 @@ class Vote:
     player: str
     commit_hash: str
     vote: str
-    stake: int
+    stake: u256
     bluff: str
     revealed: bool
 
@@ -31,94 +30,65 @@ class Vote:
 @dataclass
 class Appeal:
     player: str
-    xp_spent: int
+    xp_spent: u256
     resolved: bool
     overturned: bool
 
 @allow_storage
 @dataclass
 class Round:
-    round_number: int
+    round_number: u256
     claim: str
     source_url: str
     category: str
     difficulty: str
     difficulty_multiplier: float
-    votes: DynArray[Vote] # Use DynArray
+    votes: DynArray[Vote]  # Use DynArray
     verdict: str
     validator_breakdown: str
     appeal: Appeal | None
     phase: str
-    phase_deadline: int
+    phase_deadline: u256
 
 @allow_storage
 @dataclass
 class Room:
     room_id: str
     host: str
-    players: DynArray[str] # Use DynArray
+    players: DynArray[str]
     status: str
     room_type: str
-    current_round: int
-    total_rounds: int
+    current_round: u256
+    total_rounds: u256
     rounds: DynArray[Round]
     leader_validator: str
     category_votes: DynArray[str]
-    created_at: int
+    created_at: u256
     spectators: DynArray[str]
 
 class GenJury(gl.Contract):
-    # 2. Used DynArray for state variables
+    # Fixed lines 75 & 76: Use u256 and provide default values
     rooms: TreeMap[str, Room]
     players: TreeMap[str, Player]
     global_leaderboard: DynArray[str]
-    season_number: int
-    season_end: int
+    season_number: u256 = u256(1)
+    season_end: u256 = u256(0)
 
     def __init__(self):
         self.rooms = TreeMap()
         self.players = TreeMap()
         self.global_leaderboard = DynArray()
-        self.season_number = 1
-        self.season_end = 0
+        self.season_number = u256(1)
+        self.season_end = u256(0)
 
     @gl.public.write
     def register_player(self) -> None:
         addr = gl.message.sender_address
         if addr not in self.players:
+            # Note: 100 becomes u256(100)
             self.players[addr] = Player(
-                address=addr, xp=100, streak=0, games_played=0,
-                correct_votes=0, successful_bluffs=0, successful_appeals=0, badge="Rookie"
+                address=addr, xp=u256(100), streak=u256(0), games_played=u256(0),
+                correct_votes=u256(0), successful_bluffs=u256(0), successful_appeals=u256(0), 
+                badge="Rookie"
             )
             self.global_leaderboard.append(addr)
-
-    @gl.public.write
-    def create_room(self, room_id: str, room_type: str, total_rounds: int) -> None:
-        addr = gl.message.sender_address
-        if addr not in self.players:
-            raise gl.vm.UserError("Register first")
-        
-        # 3. Initialize DynArrays as empty, then append
-        room = Room(
-            room_id=room_id,
-            host=addr,
-            players=DynArray(),
-            status="waiting",
-            room_type=room_type,
-            current_round=0,
-            total_rounds=total_rounds,
-            rounds=DynArray(),
-            leader_validator=addr,
-            category_votes=DynArray(),
-            created_at=gl.message.timestamp,
-            spectators=DynArray()
-        )
-        room.players.append(addr)
-        self.rooms[room_id] = room
-
-    @gl.public.view
-    def get_room(self, room_id: str) -> dict:
-        if room_id not in self.rooms:
-            return {}
-        r = self.rooms[room_id]
-        return {"id": r.room_id, "host": r.host, "player_count": len(r.players)}
