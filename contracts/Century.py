@@ -1,3 +1,4 @@
+# v0.2.16
 # { "Depends": "py-genlayer:1jb45aa8ynh2a9c9xn3b7qqh8sm5q93hwfp7jqmwsfhh8jpz09h6" }
 from genlayer import *
 import json
@@ -61,6 +62,7 @@ class Room:
     spectators: dynarray[str]
 
 class GenJury(gl.Contract):
+    # State variables must be defined here
     rooms: TreeMap[str, Room]
     players: TreeMap[str, Player]
     global_leaderboard: dynarray[str]
@@ -68,10 +70,10 @@ class GenJury(gl.Contract):
     season_end: int
 
     def __init__(self):
-        # GenLayer storage initialization
         self.rooms = TreeMap()
         self.players = TreeMap()
         self.global_leaderboard = dynarray()
+        # Ensure these match the types defined above
         self.season_number = 1
         self.season_end = 0
 
@@ -91,39 +93,3 @@ class GenJury(gl.Contract):
             )
             self.players[addr] = new_player
             self.global_leaderboard.append(addr)
-
-    @gl.public.write
-    def create_room(self, room_id: str, room_type: str, total_rounds: int) -> None:
-        addr = gl.message.sender_address
-        if addr not in self.players:
-            raise gl.vm.UserError("Register first")
-        if room_id in self.rooms:
-            raise gl.vm.UserError("Room ID already exists")
-
-        new_room = Room(
-            room_id=room_id,
-            host=addr,
-            players=dynarray(),
-            status="waiting",
-            room_type=room_type,
-            current_round=0,
-            total_rounds=total_rounds,
-            rounds=dynarray(),
-            leader_validator=addr,
-            category_votes=dynarray(),
-            created_at=gl.message.timestamp,
-            spectators=dynarray()
-        )
-        new_room.players.append(addr)
-        self.rooms[room_id] = new_room
-
-    @gl.public.view
-    def get_player(self, address: str) -> dict:
-        if address not in self.players:
-            return {}
-        p = self.players[address]
-        return {
-            "address": p.address,
-            "xp": p.xp,
-            "badge": p.badge
-        }
