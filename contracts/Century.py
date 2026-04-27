@@ -3,10 +3,6 @@ from genlayer import *
 import json
 import hashlib
 
-# ─────────────────────────────────────────────
-#  GenJury — Intelligent Contract
-# ─────────────────────────────────────────────
-
 @dataclass
 class Player:
     address: str
@@ -16,7 +12,7 @@ class Player:
     correct_votes: int
     successful_bluffs: int
     successful_appeals: int
-    badge: str 
+    badge: str
 
 @dataclass
 class Vote:
@@ -72,6 +68,7 @@ class GenJury(gl.Contract):
     season_end: int
 
     def __init__(self):
+        # GenLayer storage initialization
         self.rooms = TreeMap()
         self.players = TreeMap()
         self.global_leaderboard = dynarray()
@@ -82,7 +79,7 @@ class GenJury(gl.Contract):
     def register_player(self) -> None:
         addr = gl.message.sender_address
         if addr not in self.players:
-            self.players[addr] = Player(
+            new_player = Player(
                 address=addr,
                 xp=100,
                 streak=0,
@@ -92,6 +89,7 @@ class GenJury(gl.Contract):
                 successful_appeals=0,
                 badge="Rookie"
             )
+            self.players[addr] = new_player
             self.global_leaderboard.append(addr)
 
     @gl.public.write
@@ -102,7 +100,6 @@ class GenJury(gl.Contract):
         if room_id in self.rooms:
             raise gl.vm.UserError("Room ID already exists")
 
-        # Initialize Room with empty dynarrays first
         new_room = Room(
             room_id=room_id,
             host=addr,
@@ -117,40 +114,16 @@ class GenJury(gl.Contract):
             created_at=gl.message.timestamp,
             spectators=dynarray()
         )
-        # Add the host to the players dynarray
         new_room.players.append(addr)
         self.rooms[room_id] = new_room
 
-    @gl.public.write
-    def join_room(self, room_id: str) -> None:
-        addr = gl.message.sender_address
-        if room_id not in self.rooms:
-            raise gl.vm.UserError("Room not found")
-        
-        room = self.rooms[room_id]
-        if room.status != "waiting":
-            raise gl.vm.UserError("Game already started")
-        
-        # Check if already joined (dynarray iteration)
-        already_in = False
-        for p_addr in room.players:
-            if p_addr == addr:
-                already_in = True
-                break
-        
-        if not already_in:
-            if len(room.players) >= 8:
-                raise gl.vm.UserError("Room is full")
-            room.players.append(addr)
-
     @gl.public.view
-    def get_room(self, room_id: str) -> dict:
-        if room_id not in self.rooms:
+    def get_player(self, address: str) -> dict:
+        if address not in self.players:
             return {}
-        room = self.rooms[room_id]
+        p = self.players[address]
         return {
-            "room_id": room.room_id,
-            "host": room.host,
-            "status": room.status,
-            "player_count": len(room.players)
+            "address": p.address,
+            "xp": p.xp,
+            "badge": p.badge
         }
