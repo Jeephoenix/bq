@@ -15,7 +15,7 @@ import ToastContainer       from "./components/ToastContainer";
 import WhatsNewToast        from "./components/WhatsNewToast";
 import {
   HomeIcon, MapIcon, SwordIcon, TrophyIcon, WrenchIcon,
-  LockIcon, CheckIcon, AlertIcon,
+  LockIcon, CheckIcon, AlertIcon, ZapIcon,
 } from "./components/Icons";
 
 const TABS = [
@@ -29,8 +29,8 @@ const TABS = [
 const theme = {
   bg:          "#0a0b0f",
   bgCard:      "#12141a",
-  bgNav:       "rgba(10,11,15,0.92)",
-  bgTab:       "rgba(10,11,15,0.88)",
+  bgNav:       "rgba(10,11,15,0.94)",
+  bgTab:       "rgba(10,11,15,0.92)",
   border:      "rgba(255,255,255,0.07)",
   text:        "#f1f5f9",
   textMuted:   "#64748b",
@@ -45,6 +45,9 @@ export default function App() {
   const [toolsVisited,   setToolsVisited]   = useState(
     () => typeof window !== "undefined" && Boolean(localStorage.getItem("bq_tools_seen"))
   );
+  const [bannerDismissed, setBannerDismissed] = useState(
+    () => typeof window !== "undefined" && Boolean(localStorage.getItem("bq_banner_v2"))
+  );
 
   const handleSetActiveTab = useCallback((tabId) => {
     setActiveTab(tabId);
@@ -53,6 +56,12 @@ export default function App() {
       setToolsVisited(true);
     }
   }, [toolsVisited]);
+
+  const dismissBanner = () => {
+    localStorage.setItem("bq_banner_v2", "1");
+    setBannerDismissed(true);
+  };
+
   const [showPrivacy,    setShowPrivacy]    = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => !localStorage.getItem("bq_onboarded"));
   const [toasts,         setToasts]         = useState([]);
@@ -115,121 +124,137 @@ export default function App() {
   const SignScreen = () => (
     <div style={{
       position: "fixed", inset: 0, zIndex: 500,
-      background: "#0a0b0f",
+      background: "rgba(10,11,15,0.97)",
+      backdropFilter: "blur(20px)",
       display: "flex", alignItems: "center", justifyContent: "center",
       padding: "24px",
     }}>
-      <div style={{ width: "100%", maxWidth: "360px", position: "relative" }}>
+      <div style={{ width: "100%", maxWidth: "380px", position: "relative" }}>
 
+        {/* Background glow */}
         <div style={{
-          width: "52px", height: "52px",
-          background: "#0052ff",
-          borderRadius: "14px",
-          display: "flex", alignItems: "center", justifyContent: "center",
-          marginBottom: "20px",
-        }}>
-          <LockIcon size={24} style={{ color: "white" }} />
-        </div>
+          position: "absolute", top: "50%", left: "50%", transform: "translate(-50%, -60%)",
+          width: "300px", height: "300px",
+          background: "radial-gradient(circle, rgba(0,82,255,0.08) 0%, transparent 70%)",
+          borderRadius: "50%", pointerEvents: "none",
+        }} />
 
-        <div style={{ fontSize: "20px", fontWeight: "700", color: "#f1f5f9", marginBottom: "8px", letterSpacing: "-0.03em" }}>
-          Verify Wallet Ownership
-        </div>
-        <div style={{ fontSize: "14px", color: "#64748b", marginBottom: "28px", lineHeight: "1.6" }}>
-          Sign a free message to access BaseQuest. No gas, no transaction.
-        </div>
-
-        <div style={{
-          background: "#12141a",
-          border: "1px solid rgba(255,255,255,0.07)",
-          borderRadius: "14px", padding: "16px", marginBottom: "20px",
-        }}>
+        <div style={{ position: "relative" }}>
           <div style={{
-            fontSize: "11px", color: "#64748b", fontWeight: "600",
-            marginBottom: "10px", textTransform: "uppercase", letterSpacing: "0.06em",
+            width: "56px", height: "56px",
+            background: "linear-gradient(135deg, #0052ff, #1a6aff)",
+            borderRadius: "16px",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            marginBottom: "24px",
+            boxShadow: "0 0 32px rgba(0,82,255,0.4)",
           }}>
-            Signature Preview
+            <LockIcon size={24} style={{ color: "white" }} />
           </div>
-          {[
-            "Welcome to BaseQuest!",
-            "You are the owner of this wallet",
-            "You agree to build genuine on-chain history",
-          ].map((text, i) => (
-            <div key={i} style={{
-              display: "flex", alignItems: "flex-start", gap: "9px",
-              marginBottom: i < 2 ? "8px" : "0",
+
+          <div style={{ fontSize: "22px", fontWeight: "800", color: "#f1f5f9", marginBottom: "8px", letterSpacing: "-0.04em" }}>
+            Verify Wallet Ownership
+          </div>
+          <div style={{ fontSize: "14px", color: "#64748b", marginBottom: "28px", lineHeight: "1.65" }}>
+            Sign a free message to access BaseQuest. No gas, no transaction.
+          </div>
+
+          <div style={{
+            background: "#12141a",
+            border: "1px solid rgba(0,82,255,0.2)",
+            borderRadius: "16px", padding: "18px", marginBottom: "20px",
+            boxShadow: "0 0 20px rgba(0,82,255,0.06)",
+          }}>
+            <div style={{
+              fontSize: "10px", color: "#64748b", fontWeight: "700",
+              marginBottom: "12px", textTransform: "uppercase", letterSpacing: "0.08em",
             }}>
-              <span style={{ color: "#0052ff", flexShrink: 0, marginTop: "1px" }}>
-                <CheckIcon size={13} />
-              </span>
-              <span style={{ fontSize: "13px", color: "#c1c9d6", lineHeight: "1.5" }}>{text}</span>
+              Signature Preview
             </div>
-          ))}
-          <div style={{
-            marginTop: "12px", paddingTop: "12px",
-            borderTop: "1px solid rgba(255,255,255,0.07)",
-            fontSize: "12px", color: "#64748b",
-          }}>
-            BaseQuest — Build your on-chain legacy
+            {[
+              "Welcome to BaseQuest!",
+              "You are the owner of this wallet",
+              "You agree to build genuine on-chain history",
+            ].map((text, i) => (
+              <div key={i} style={{
+                display: "flex", alignItems: "flex-start", gap: "10px",
+                marginBottom: i < 2 ? "10px" : "0",
+              }}>
+                <span style={{ color: "#0052ff", flexShrink: 0, marginTop: "2px" }}>
+                  <CheckIcon size={13} />
+                </span>
+                <span style={{ fontSize: "13px", color: "#c1c9d6", lineHeight: "1.5" }}>{text}</span>
+              </div>
+            ))}
+            <div style={{
+              marginTop: "14px", paddingTop: "14px",
+              borderTop: "1px solid rgba(255,255,255,0.07)",
+              fontSize: "12px", color: "#64748b",
+              display: "flex", alignItems: "center", gap: "6px",
+            }}>
+              <ZapIcon size={11} style={{ color: "#0052ff" }} />
+              BaseQuest — Build your on-chain legacy
+            </div>
           </div>
-        </div>
 
-        {wallet.signError && (
-          <div style={{
-            background: "rgba(255,59,59,0.07)",
-            border: "1px solid rgba(255,59,59,0.2)",
-            borderRadius: "10px", padding: "10px 14px",
-            color: "#ff6b6b", fontSize: "13px",
-            marginBottom: "16px",
-            display: "flex", alignItems: "center", gap: "8px",
-          }}>
-            <AlertIcon size={14} style={{ flexShrink: 0 }} />
-            {wallet.signError}
-          </div>
-        )}
+          {wallet.signError && (
+            <div style={{
+              background: "rgba(255,59,59,0.07)",
+              border: "1px solid rgba(255,59,59,0.2)",
+              borderRadius: "12px", padding: "12px 14px",
+              color: "#ff6b6b", fontSize: "13px",
+              marginBottom: "16px",
+              display: "flex", alignItems: "center", gap: "8px",
+            }}>
+              <AlertIcon size={14} style={{ flexShrink: 0 }} />
+              {wallet.signError}
+            </div>
+          )}
 
-        <button
-          onClick={wallet.signWelcome}
-          disabled={wallet.signing}
-          style={{
-            width: "100%",
-            background: wallet.signing ? "rgba(0,82,255,0.4)" : "#0052ff",
-            border: "none", borderRadius: "12px", padding: "14px",
-            color: "white", fontWeight: "600", fontSize: "15px",
-            cursor: wallet.signing ? "not-allowed" : "pointer",
-            marginBottom: "12px", fontFamily: "inherit", letterSpacing: "-0.01em",
-            transition: "all 0.15s",
-          }}
-          onMouseEnter={e => { if (!wallet.signing) e.currentTarget.style.background = "#1a64ff"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = wallet.signing ? "rgba(0,82,255,0.4)" : "#0052ff"; }}
-        >
-          {wallet.signing ? "Waiting for signature..." : "Sign & Enter BaseQuest"}
-        </button>
-
-        <button
-          onClick={wallet.disconnectWallet}
-          style={{
-            background: "none", border: "none",
-            color: "#64748b", fontSize: "13px",
-            cursor: "pointer", padding: "8px", fontFamily: "inherit",
-            width: "100%", textAlign: "center",
-            transition: "color 0.15s",
-          }}
-          onMouseEnter={e => e.currentTarget.style.color = "#f1f5f9"}
-          onMouseLeave={e => e.currentTarget.style.color = "#64748b"}
-        >
-          ← Use a different wallet
-        </button>
-
-        <div style={{ marginTop: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div style={{ fontSize: "12px", color: "#334155", fontVariantNumeric: "tabular-nums" }}>
-            {wallet.address?.slice(0, 6)}...{wallet.address?.slice(-4)}
-          </div>
-          <span
-            onClick={() => setShowPrivacy(true)}
-            style={{ color: "#334155", fontSize: "12px", cursor: "pointer", textDecoration: "underline" }}
+          <button
+            onClick={wallet.signWelcome}
+            disabled={wallet.signing}
+            style={{
+              width: "100%",
+              background: wallet.signing ? "rgba(0,82,255,0.4)" : "linear-gradient(135deg, #0052ff, #1a6aff)",
+              border: "1px solid rgba(255,255,255,0.12)", borderRadius: "14px", padding: "15px",
+              color: "white", fontWeight: "700", fontSize: "15px",
+              cursor: wallet.signing ? "not-allowed" : "pointer",
+              marginBottom: "12px", fontFamily: "inherit", letterSpacing: "-0.02em",
+              transition: "all 0.15s",
+              boxShadow: wallet.signing ? "none" : "0 0 24px rgba(0,82,255,0.4)",
+            }}
+            onMouseEnter={e => { if (!wallet.signing) { e.currentTarget.style.boxShadow = "0 0 36px rgba(0,82,255,0.6)"; e.currentTarget.style.transform = "translateY(-1px)"; }}}
+            onMouseLeave={e => { e.currentTarget.style.boxShadow = wallet.signing ? "none" : "0 0 24px rgba(0,82,255,0.4)"; e.currentTarget.style.transform = "none"; }}
           >
-            Privacy Policy
-          </span>
+            {wallet.signing ? "Waiting for signature..." : "Sign & Enter BaseQuest"}
+          </button>
+
+          <button
+            onClick={wallet.disconnectWallet}
+            style={{
+              background: "none", border: "none",
+              color: "#64748b", fontSize: "13px",
+              cursor: "pointer", padding: "8px", fontFamily: "inherit",
+              width: "100%", textAlign: "center",
+              transition: "color 0.15s",
+            }}
+            onMouseEnter={e => e.currentTarget.style.color = "#c1c9d6"}
+            onMouseLeave={e => e.currentTarget.style.color = "#64748b"}
+          >
+            ← Use a different wallet
+          </button>
+
+          <div style={{ marginTop: "16px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ fontSize: "12px", color: "#334155", fontVariantNumeric: "tabular-nums" }}>
+              {wallet.address?.slice(0, 6)}...{wallet.address?.slice(-4)}
+            </div>
+            <span
+              onClick={() => setShowPrivacy(true)}
+              style={{ color: "#334155", fontSize: "12px", cursor: "pointer", textDecoration: "underline" }}
+            >
+              Privacy Policy
+            </span>
+          </div>
         </div>
       </div>
     </div>
@@ -257,6 +282,44 @@ export default function App() {
         </div>
       )}
 
+      {/* Announcement banner */}
+      {!bannerDismissed && (
+        <div style={{
+          background: "linear-gradient(90deg, rgba(0,82,255,0.12), rgba(0,82,255,0.06), rgba(0,82,255,0.12))",
+          borderBottom: "1px solid rgba(0,82,255,0.18)",
+          padding: "8px 20px",
+          display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+          position: "relative",
+        }}>
+          <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#00c853", boxShadow: "0 0 6px rgba(0,200,83,0.6)", flexShrink: 0 }} />
+          <span style={{ fontSize: "12px", color: "#6b9fff", fontWeight: "500" }}>
+            Boss Raid is live — attack the boss and win from the ETH prize pool
+          </span>
+          <button
+            onClick={() => { handleSetActiveTab("bossraid"); dismissBanner(); }}
+            style={{
+              background: "rgba(0,82,255,0.15)", border: "1px solid rgba(0,82,255,0.3)",
+              borderRadius: "6px", padding: "2px 10px",
+              color: "#6b9fff", fontSize: "11px", fontWeight: "700",
+              cursor: "pointer", fontFamily: "inherit",
+            }}
+          >
+            Join →
+          </button>
+          <button
+            onClick={dismissBanner}
+            style={{
+              position: "absolute", right: "16px", top: "50%", transform: "translateY(-50%)",
+              background: "none", border: "none", cursor: "pointer",
+              color: "#64748b", fontSize: "16px", lineHeight: "1",
+              fontFamily: "inherit", padding: "4px",
+            }}
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       <Navbar wallet={walletWithProfile} theme={theme} />
 
       {/* Desktop Tab bar */}
@@ -264,9 +327,9 @@ export default function App() {
         className="desktop-nav"
         style={{
           borderBottom: "1px solid rgba(255,255,255,0.07)",
-          background: "rgba(10,11,15,0.88)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
+          background: "rgba(10,11,15,0.92)",
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
           position: "sticky",
           top: "60px",
           zIndex: 90,
@@ -283,30 +346,31 @@ export default function App() {
                 style={{
                   background: "none", border: "none",
                   borderBottom: active ? "2px solid #0052ff" : "2px solid transparent",
-                  padding: "13px 16px",
+                  padding: "13px 18px",
                   color: active ? "#f1f5f9" : showPulse ? "#0052ff" : "#64748b",
-                  fontWeight: active ? "600" : "400",
+                  fontWeight: active ? "700" : "400",
                   fontSize: "13px",
                   cursor: "pointer",
                   whiteSpace: "nowrap",
                   transition: "all 0.12s",
                   display: "flex", alignItems: "center", gap: "7px",
                   fontFamily: "inherit",
-                  letterSpacing: "-0.01em",
+                  letterSpacing: "-0.02em",
                   position: "relative",
+                  boxShadow: active ? "0 2px 0 0 rgba(0,82,255,0.4)" : "none",
                 }}
-                onMouseEnter={e => { if (!active && !showPulse) e.currentTarget.style.color = "#c1c9d6"; }}
-                onMouseLeave={e => { if (!active && !showPulse) e.currentTarget.style.color = "#64748b"; }}
+                onMouseEnter={e => { if (!active && !showPulse) { e.currentTarget.style.color = "#c1c9d6"; e.currentTarget.style.borderBottomColor = "rgba(255,255,255,0.15)"; }}}
+                onMouseLeave={e => { if (!active && !showPulse) { e.currentTarget.style.color = "#64748b"; e.currentTarget.style.borderBottomColor = "transparent"; }}}
               >
-                <tab.Icon size={14} />
+                <tab.Icon size={14} style={{ color: active ? "#0052ff" : "inherit" }} />
                 {tab.label}
                 {tab.id === "bossraid" && (
                   <span style={{
-                    background: "rgba(255,59,59,0.12)",
+                    background: "rgba(255,59,59,0.1)",
                     border: "1px solid rgba(255,59,59,0.22)",
                     borderRadius: "4px", padding: "1px 5px",
                     color: "#ff6b6b", fontSize: "9px", fontWeight: "700",
-                    letterSpacing: "0.06em",
+                    letterSpacing: "0.07em",
                   }}>LIVE</span>
                 )}
                 {showPulse && (
@@ -331,33 +395,43 @@ export default function App() {
       {/* Footer */}
       <footer className="app-footer" style={{
         borderTop: "1px solid rgba(255,255,255,0.07)",
-        padding: "32px 20px 80px",
+        padding: "40px 20px 80px",
         marginTop: "24px",
+        background: "rgba(10,11,15,0.8)",
       }}>
         <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
           <div style={{
             display: "flex", justifyContent: "space-between", alignItems: "flex-start",
-            flexWrap: "wrap", gap: "24px", marginBottom: "28px",
+            flexWrap: "wrap", gap: "32px", marginBottom: "32px",
           }}>
             {/* Brand */}
             <div>
               <div style={{
-                color: "#f1f5f9", fontWeight: "700", fontSize: "15px",
-                letterSpacing: "-0.03em", marginBottom: "6px",
+                fontWeight: "800", fontSize: "18px",
+                letterSpacing: "-0.04em", marginBottom: "8px",
               }}>
-                Base<span style={{ color: "#0052ff" }}>Quest</span>
+                Base<span style={{
+                  background: "linear-gradient(135deg, #0052ff, #6b9fff)",
+                  WebkitBackgroundClip: "text",
+                  WebkitTextFillColor: "transparent",
+                  backgroundClip: "text",
+                }}>Quest</span>
               </div>
-              <div style={{ color: "#64748b", fontSize: "12px", maxWidth: "200px", lineHeight: "1.6" }}>
+              <div style={{ color: "#64748b", fontSize: "13px", maxWidth: "200px", lineHeight: "1.65" }}>
                 Farm Base. Earn XP.<br />Dominate the Chain.
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: "6px", marginTop: "12px" }}>
+                <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#00c853", boxShadow: "0 0 6px rgba(0,200,83,0.6)" }} />
+                <span style={{ color: "#64748b", fontSize: "11px" }}>All systems operational</span>
               </div>
             </div>
 
             {/* Links */}
-            <div style={{ display: "flex", gap: "40px", flexWrap: "wrap" }}>
+            <div style={{ display: "flex", gap: "48px", flexWrap: "wrap" }}>
               <div>
                 <div style={{
-                  color: "#334155", fontSize: "11px", fontWeight: "600",
-                  letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "10px",
+                  color: "#334155", fontSize: "10px", fontWeight: "700",
+                  letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "12px",
                 }}>Product</div>
                 {[
                   { label: "Quests",      action: () => setActiveTab("quests") },
@@ -365,7 +439,7 @@ export default function App() {
                   { label: "Leaderboard", action: () => setActiveTab("leaderboard") },
                   { label: "Tools",       action: () => setActiveTab("tools") },
                 ].map(l => (
-                  <div key={l.label} style={{ marginBottom: "7px" }}>
+                  <div key={l.label} style={{ marginBottom: "8px" }}>
                     <button
                       onClick={l.action}
                       style={{
@@ -384,8 +458,8 @@ export default function App() {
 
               <div>
                 <div style={{
-                  color: "#334155", fontSize: "11px", fontWeight: "600",
-                  letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "10px",
+                  color: "#334155", fontSize: "10px", fontWeight: "700",
+                  letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: "12px",
                 }}>Resources</div>
                 {[
                   { label: "Privacy Policy", action: () => setShowPrivacy(true) },
@@ -393,7 +467,7 @@ export default function App() {
                   { label: "Base Mainnet", href: "https://base.org" },
                   { label: "Basescan", href: "https://basescan.org" },
                 ].map(l => (
-                  <div key={l.label} style={{ marginBottom: "7px" }}>
+                  <div key={l.label} style={{ marginBottom: "8px" }}>
                     {l.href ? (
                       <a
                         href={l.href} target="_blank" rel="noreferrer"
@@ -436,9 +510,16 @@ export default function App() {
             <div style={{ color: "#334155", fontSize: "12px" }}>
               © 2026 BaseQuest™ — Built on Base
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-              <div style={{ width: "5px", height: "5px", borderRadius: "50%", background: "#00c853" }} />
-              <span style={{ color: "#64748b", fontSize: "12px" }}>All systems operational</span>
+            <div style={{
+              display: "flex", alignItems: "center", gap: "6px",
+              background: "rgba(0,82,255,0.08)", border: "1px solid rgba(0,82,255,0.15)",
+              borderRadius: "6px", padding: "4px 10px",
+            }}>
+              <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+                <circle cx="5" cy="5" r="4" fill="#0052ff" opacity="0.3"/>
+                <circle cx="5" cy="5" r="2" fill="#0052ff"/>
+              </svg>
+              <span style={{ color: "#6b9fff", fontSize: "11px", fontWeight: "600" }}>Base Mainnet</span>
             </div>
           </div>
         </div>
@@ -450,9 +531,9 @@ export default function App() {
         style={{
           position: "fixed", bottom: 0, left: 0, right: 0,
           background: "rgba(10,11,15,0.97)",
-          borderTop: "1px solid rgba(255,255,255,0.07)",
-          backdropFilter: "blur(20px)",
-          WebkitBackdropFilter: "blur(20px)",
+          borderTop: "1px solid rgba(255,255,255,0.08)",
+          backdropFilter: "blur(24px)",
+          WebkitBackdropFilter: "blur(24px)",
           zIndex: 100,
           paddingBottom: "env(safe-area-inset-bottom, 8px)",
         }}
@@ -480,24 +561,34 @@ export default function App() {
                 {active && (
                   <span style={{
                     position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
-                    width: "20px", height: "2px",
-                    background: "#0052ff", borderRadius: "0 0 2px 2px",
+                    width: "24px", height: "2px",
+                    background: "linear-gradient(90deg, #0052ff, #6b9fff)",
+                    borderRadius: "0 0 2px 2px",
+                    boxShadow: "0 0 8px rgba(0,82,255,0.6)",
                   }} />
                 )}
-                <tab.Icon size={19} />
-                <span style={{ fontSize: "10px", fontWeight: active ? "600" : "400", letterSpacing: "-0.01em" }}>
+                <div style={{
+                  padding: "4px 8px",
+                  borderRadius: "8px",
+                  background: active ? "rgba(0,82,255,0.1)" : "transparent",
+                  transition: "background 0.15s",
+                }}>
+                  <tab.Icon size={19} />
+                </div>
+                <span style={{ fontSize: "10px", fontWeight: active ? "700" : "400", letterSpacing: "-0.01em" }}>
                   {tab.label.split(" ")[0]}
                 </span>
                 {tab.id === "bossraid" && (
                   <span style={{
-                    position: "absolute", top: "8px", right: "calc(50% - 16px)",
+                    position: "absolute", top: "8px", right: "calc(50% - 18px)",
                     width: "5px", height: "5px",
                     background: "#ff3b3b", borderRadius: "50%",
+                    boxShadow: "0 0 4px rgba(255,59,59,0.8)",
                   }} />
                 )}
                 {showPulse && (
                   <span style={{
-                    position: "absolute", top: "8px", right: "calc(50% - 18px)",
+                    position: "absolute", top: "8px", right: "calc(50% - 20px)",
                     width: "7px", height: "7px",
                     background: "#0052ff", borderRadius: "50%",
                     animation: "tab-pulse 1.8s ease-in-out infinite",
@@ -516,7 +607,19 @@ export default function App() {
       <style>{`
         @keyframes tab-pulse {
           0%, 100% { transform: scale(1);   box-shadow: 0 0 0 0   rgba(0,82,255,0.5); }
-          50%      { transform: scale(1.2); box-shadow: 0 0 0 6px rgba(0,82,255,0); }
+          50%      { transform: scale(1.3); box-shadow: 0 0 0 6px rgba(0,82,255,0); }
+        }
+        @keyframes float {
+          0%,100% { transform: translateY(0); }
+          50%      { transform: translateY(-8px); }
+        }
+        @keyframes live-pulse {
+          0%,100% { opacity: 1; }
+          50%      { opacity: 0.5; }
+        }
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(12px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { background: #0a0b0f; font-family: 'Inter', sans-serif; }
