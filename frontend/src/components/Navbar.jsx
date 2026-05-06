@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { shortAddr, getLevelInfo } from "../utils/contracts";
 import {
-  WalletIcon, LinkIcon, LogOutIcon, AlertIcon, ChevronDownIcon,
+  WalletIcon, LinkIcon, LogOutIcon, AlertIcon, ChevronDownIcon, ZapIcon,
 } from "./Icons";
 
 const WALLET_OPTIONS = [
@@ -49,6 +49,26 @@ const WALLET_OPTIONS = [
   },
 ];
 
+const BaseChainBadge = () => (
+  <div style={{
+    display: "flex", alignItems: "center", gap: "5px",
+    background: "rgba(0,82,255,0.1)",
+    border: "1px solid rgba(0,82,255,0.25)",
+    borderRadius: "6px",
+    padding: "3px 8px",
+    fontSize: "11px",
+    fontWeight: "600",
+    color: "#6b9fff",
+    flexShrink: 0,
+  }}>
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+      <circle cx="5" cy="5" r="4" fill="#0052ff" opacity="0.3"/>
+      <circle cx="5" cy="5" r="2" fill="#0052ff"/>
+    </svg>
+    Base
+  </div>
+);
+
 export default function Navbar({ wallet, theme }) {
   const {
     address, isConnected, connecting,
@@ -66,9 +86,9 @@ export default function Navbar({ wallet, theme }) {
     <nav style={{
       position: "sticky", top: 0, zIndex: 100,
       borderBottom: "1px solid rgba(255,255,255,0.07)",
-      background: "rgba(10,11,15,0.92)",
-      backdropFilter: "blur(20px)",
-      WebkitBackdropFilter: "blur(20px)",
+      background: "rgba(10,11,15,0.94)",
+      backdropFilter: "blur(24px)",
+      WebkitBackdropFilter: "blur(24px)",
       height: "60px",
       display: "flex", alignItems: "center",
     }}>
@@ -84,22 +104,28 @@ export default function Navbar({ wallet, theme }) {
           <div style={{
             width: "32px", height: "32px",
             borderRadius: "9px",
-            background: "#0052ff",
+            background: "linear-gradient(135deg, #0052ff, #1a6aff)",
             display: "flex", alignItems: "center", justifyContent: "center",
             flexShrink: 0,
             overflow: "hidden",
+            boxShadow: "0 0 16px rgba(0,82,255,0.4)",
           }}>
             <img
               src="/logo.png" alt="BQ"
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
               onError={e => {
                 e.target.style.display = "none";
-                e.target.parentNode.innerHTML = '<span style="color:white;font-weight:700;font-size:13px;font-family:Inter,sans-serif;letter-spacing:-0.02em">BQ</span>';
+                e.target.parentNode.innerHTML = '<span style="color:white;font-weight:800;font-size:13px;font-family:Inter,sans-serif;letter-spacing:-0.02em">BQ</span>';
               }}
             />
           </div>
-          <span style={{ color: "#f1f5f9", fontWeight: "700", fontSize: "16px", letterSpacing: "-0.03em" }}>
-            Base<span style={{ color: "#0052ff" }}>Quest</span>
+          <span style={{ color: "#f1f5f9", fontWeight: "800", fontSize: "16px", letterSpacing: "-0.04em" }}>
+            Base<span style={{
+              background: "linear-gradient(135deg, #0052ff, #6b9fff)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}>Quest</span>
           </span>
         </div>
 
@@ -113,14 +139,15 @@ export default function Navbar({ wallet, theme }) {
               className="navbar-wrong-network"
               style={{
                 background: "rgba(255,59,59,0.08)",
-                border: "1px solid rgba(255,59,59,0.2)",
+                border: "1px solid rgba(255,59,59,0.25)",
                 borderRadius: "8px", padding: "6px 12px",
-                color: "#ff6b6b", fontWeight: "500", fontSize: "12px",
+                color: "#ff6b6b", fontWeight: "600", fontSize: "12px",
                 cursor: "pointer", fontFamily: "inherit",
                 display: "flex", alignItems: "center", gap: "6px",
                 transition: "all 0.15s",
+                boxShadow: "0 0 12px rgba(255,59,59,0.15)",
               }}
-              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,59,59,0.12)"}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,59,59,0.14)"}
               onMouseLeave={e => e.currentTarget.style.background = "rgba(255,59,59,0.08)"}
             >
               <AlertIcon size={13} />
@@ -135,16 +162,17 @@ export default function Navbar({ wallet, theme }) {
                 onClick={() => setShowWalletMenu(v => !v)}
                 disabled={connecting}
                 style={{
-                  background: connecting ? "rgba(0,82,255,0.5)" : "#0052ff",
-                  border: "none", borderRadius: "9px", padding: "8px 16px",
-                  color: "white", fontWeight: "600", fontSize: "13px",
+                  background: connecting ? "rgba(0,82,255,0.5)" : "linear-gradient(135deg, #0052ff, #1a6aff)",
+                  border: "1px solid rgba(255,255,255,0.12)", borderRadius: "9px", padding: "8px 16px",
+                  color: "white", fontWeight: "700", fontSize: "13px",
                   cursor: connecting ? "not-allowed" : "pointer",
-                  fontFamily: "inherit", letterSpacing: "-0.01em",
+                  fontFamily: "inherit", letterSpacing: "-0.02em",
                   display: "flex", alignItems: "center", gap: "7px",
                   transition: "all 0.15s",
+                  boxShadow: connecting ? "none" : "0 0 20px rgba(0,82,255,0.4)",
                 }}
-                onMouseEnter={e => { if (!connecting) e.currentTarget.style.background = "#1a64ff"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = connecting ? "rgba(0,82,255,0.5)" : "#0052ff"; }}
+                onMouseEnter={e => { if (!connecting) { e.currentTarget.style.boxShadow = "0 0 28px rgba(0,82,255,0.6)"; e.currentTarget.style.transform = "translateY(-1px)"; }}}
+                onMouseLeave={e => { e.currentTarget.style.boxShadow = connecting ? "none" : "0 0 20px rgba(0,82,255,0.4)"; e.currentTarget.style.transform = "none"; }}
               >
                 <WalletIcon size={14} />
                 {connecting ? "Connecting..." : "Connect Wallet"}
@@ -152,22 +180,22 @@ export default function Navbar({ wallet, theme }) {
 
               {showWalletMenu && (
                 <div style={{
-                  position: "absolute", right: 0, top: "calc(100% + 8px)",
-                  width: "220px",
-                  background: "#12141a",
-                  border: "1px solid rgba(255,255,255,0.09)",
-                  borderRadius: "14px", padding: "6px",
+                  position: "absolute", right: 0, top: "calc(100% + 10px)",
+                  width: "240px",
+                  background: "#13151d",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  borderRadius: "16px", padding: "8px",
                   zIndex: 200,
-                  boxShadow: "0 16px 48px rgba(0,0,0,0.7)",
+                  boxShadow: "0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04)",
                 }}>
                   <div style={{
                     padding: "8px 12px 10px",
                     borderBottom: "1px solid rgba(255,255,255,0.07)",
-                    marginBottom: "4px",
+                    marginBottom: "6px",
                     fontSize: "11px",
                     color: "#64748b",
-                    fontWeight: "500",
-                    letterSpacing: "0.04em",
+                    fontWeight: "600",
+                    letterSpacing: "0.06em",
                     textTransform: "uppercase",
                   }}>
                     Select Wallet
@@ -178,13 +206,13 @@ export default function Navbar({ wallet, theme }) {
                       onClick={() => { connectWallet(); setShowWalletMenu(false); }}
                       style={{
                         width: "100%", display: "flex", alignItems: "center", gap: "10px",
-                        padding: "9px 10px", background: "none", border: "none",
-                        borderRadius: "9px", color: "#f1f5f9",
+                        padding: "10px 10px", background: "none", border: "none",
+                        borderRadius: "10px", color: "#f1f5f9",
                         fontSize: "13px", fontWeight: "500",
                         cursor: "pointer", textAlign: "left", fontFamily: "inherit",
                         transition: "background 0.12s",
                       }}
-                      onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.05)"}
+                      onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.06)"}
                       onMouseLeave={e => e.currentTarget.style.background = "none"}
                     >
                       {w.icon}
@@ -199,105 +227,141 @@ export default function Navbar({ wallet, theme }) {
             </div>
 
           ) : (
-            <div style={{ position: "relative" }}>
-              <button
-                onClick={() => setShowUserMenu(v => !v)}
-                style={{
-                  display: "flex", alignItems: "center", gap: "7px",
-                  padding: "7px 12px",
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  borderRadius: "9px", color: "#f1f5f9",
-                  fontWeight: "500", fontSize: "13px",
-                  cursor: "pointer", fontFamily: "inherit", letterSpacing: "-0.01em",
-                  transition: "all 0.15s",
-                }}
-                onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,0.08)"}
-                onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,0.05)"}
-              >
-                <div style={{
-                  width: "20px", height: "20px", borderRadius: "50%",
-                  background: "rgba(0,82,255,0.2)",
-                  border: "1.5px solid rgba(0,82,255,0.35)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  flexShrink: 0,
-                }}>
-                  <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#0052ff" }} />
-                </div>
-                <span>{userProfile?.usernameSet ? userProfile.username : shortAddr(address)}</span>
-                {levelInfo && (
-                  <span style={{ color: "#64748b", fontSize: "12px", fontWeight: "400" }}>
-                    · Lv {levelInfo.current.level}
-                  </span>
-                )}
-                <ChevronDownIcon size={12} />
-              </button>
-
-              {showUserMenu && (
-                <div style={{
-                  position: "absolute", right: 0, top: "calc(100% + 8px)",
-                  width: "220px",
-                  background: "#12141a",
-                  border: "1px solid rgba(255,255,255,0.09)",
-                  borderRadius: "14px", padding: "6px",
-                  zIndex: 200,
-                  boxShadow: "0 16px 48px rgba(0,0,0,0.7)",
-                }}>
-                  {/* Profile header */}
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              {isCorrectNetwork && <BaseChainBadge />}
+              <div style={{ position: "relative" }}>
+                <button
+                  onClick={() => setShowUserMenu(v => !v)}
+                  style={{
+                    display: "flex", alignItems: "center", gap: "7px",
+                    padding: "7px 12px",
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "10px", color: "#f1f5f9",
+                    fontWeight: "600", fontSize: "13px",
+                    cursor: "pointer", fontFamily: "inherit", letterSpacing: "-0.02em",
+                    transition: "all 0.15s",
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.08)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
+                >
                   <div style={{
-                    padding: "10px 12px 12px",
-                    borderBottom: "1px solid rgba(255,255,255,0.07)",
-                    marginBottom: "4px",
+                    width: "22px", height: "22px", borderRadius: "50%",
+                    background: "linear-gradient(135deg, rgba(0,82,255,0.3), rgba(0,82,255,0.1))",
+                    border: "1.5px solid rgba(0,82,255,0.4)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    flexShrink: 0,
+                    boxShadow: "0 0 8px rgba(0,82,255,0.3)",
                   }}>
-                    <div style={{ color: "#64748b", fontSize: "11px", marginBottom: "4px", fontWeight: "500" }}>
-                      Connected on Base
-                    </div>
-                    <div style={{ color: "#f1f5f9", fontSize: "13px", fontWeight: "600", fontVariantNumeric: "tabular-nums" }}>
-                      {shortAddr(address)}
-                    </div>
-                    {levelInfo && (
-                      <div style={{ color: "#0052ff", fontSize: "12px", fontWeight: "500", marginTop: "4px" }}>
-                        {userProfile.totalXP.toLocaleString()} XP · Level {levelInfo.current.level}
-                      </div>
-                    )}
+                    <div style={{ width: "7px", height: "7px", borderRadius: "50%", background: "#0052ff" }} />
                   </div>
+                  <span>{userProfile?.usernameSet ? userProfile.username : shortAddr(address)}</span>
+                  {levelInfo && (
+                    <span style={{
+                      background: "rgba(0,82,255,0.15)",
+                      border: "1px solid rgba(0,82,255,0.25)",
+                      borderRadius: "5px", padding: "1px 6px",
+                      color: "#6b9fff", fontSize: "10px", fontWeight: "700",
+                    }}>
+                      Lv {levelInfo.current.level}
+                    </span>
+                  )}
+                  <ChevronDownIcon size={12} style={{ color: "#64748b" }} />
+                </button>
 
-                  <a
-                    href={`https://basescan.org/address/${address}`}
-                    target="_blank" rel="noreferrer"
-                    onClick={() => setShowUserMenu(false)}
-                    style={{
-                      display: "flex", alignItems: "center", gap: "9px",
-                      padding: "9px 12px", borderRadius: "9px",
-                      color: "#8892a4", fontSize: "13px",
-                      textDecoration: "none", cursor: "pointer", fontWeight: "400",
-                      transition: "all 0.12s",
-                    }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "#f1f5f9"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#8892a4"; }}
-                  >
-                    <LinkIcon size={14} />
-                    View on Basescan
-                  </a>
+                {showUserMenu && (
+                  <div style={{
+                    position: "absolute", right: 0, top: "calc(100% + 10px)",
+                    width: "240px",
+                    background: "#13151d",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    borderRadius: "16px", padding: "8px",
+                    zIndex: 200,
+                    boxShadow: "0 20px 60px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.04)",
+                  }}>
+                    {/* Profile header */}
+                    <div style={{
+                      padding: "12px 14px 14px",
+                      borderBottom: "1px solid rgba(255,255,255,0.07)",
+                      marginBottom: "6px",
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
+                        <div style={{
+                          width: "36px", height: "36px", borderRadius: "50%",
+                          background: "linear-gradient(135deg, rgba(0,82,255,0.3), rgba(0,82,255,0.1))",
+                          border: "2px solid rgba(0,82,255,0.35)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          boxShadow: "0 0 12px rgba(0,82,255,0.25)",
+                        }}>
+                          <ZapIcon size={14} style={{ color: "#6b9fff" }} />
+                        </div>
+                        <div>
+                          <div style={{ color: "#f1f5f9", fontSize: "13px", fontWeight: "700", fontVariantNumeric: "tabular-nums" }}>
+                            {shortAddr(address)}
+                          </div>
+                          <div style={{ color: "#64748b", fontSize: "11px", marginTop: "1px" }}>
+                            Connected on Base
+                          </div>
+                        </div>
+                      </div>
+                      {levelInfo && (
+                        <div style={{
+                          background: "rgba(0,82,255,0.08)",
+                          border: "1px solid rgba(0,82,255,0.15)",
+                          borderRadius: "8px", padding: "8px 10px",
+                          display: "flex", alignItems: "center", justifyContent: "space-between",
+                        }}>
+                          <div>
+                            <div style={{ color: "#6b9fff", fontSize: "11px", fontWeight: "600" }}>Level {levelInfo.current.level} — {levelInfo.current.name}</div>
+                            <div style={{ color: "#64748b", fontSize: "10px", marginTop: "1px" }}>{userProfile.totalXP.toLocaleString()} XP earned</div>
+                          </div>
+                          <div style={{
+                            background: "rgba(0,82,255,0.2)", borderRadius: "6px", padding: "4px 8px",
+                            color: "#6b9fff", fontSize: "11px", fontWeight: "800",
+                          }}>
+                            Lv {levelInfo.current.level}
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
-                  <button
-                    onClick={() => { disconnectWallet(); setShowUserMenu(false); }}
-                    style={{
-                      width: "100%", display: "flex", alignItems: "center", gap: "9px",
-                      padding: "9px 12px", background: "none", border: "none",
-                      borderRadius: "9px", color: "#ff6b6b",
-                      fontSize: "13px", fontWeight: "500",
-                      cursor: "pointer", textAlign: "left", fontFamily: "inherit",
-                      transition: "background 0.12s",
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.background = "rgba(255,59,59,0.07)"}
-                    onMouseLeave={e => e.currentTarget.style.background = "none"}
-                  >
-                    <LogOutIcon size={14} />
-                    Disconnect
-                  </button>
-                </div>
-              )}
+                    <a
+                      href={`https://basescan.org/address/${address}`}
+                      target="_blank" rel="noreferrer"
+                      onClick={() => setShowUserMenu(false)}
+                      style={{
+                        display: "flex", alignItems: "center", gap: "9px",
+                        padding: "9px 12px", borderRadius: "10px",
+                        color: "#8892a4", fontSize: "13px",
+                        textDecoration: "none", cursor: "pointer", fontWeight: "500",
+                        transition: "all 0.12s",
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "#f1f5f9"; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "none"; e.currentTarget.style.color = "#8892a4"; }}
+                    >
+                      <LinkIcon size={14} />
+                      View on Basescan
+                    </a>
+
+                    <button
+                      onClick={() => { disconnectWallet(); setShowUserMenu(false); }}
+                      style={{
+                        width: "100%", display: "flex", alignItems: "center", gap: "9px",
+                        padding: "9px 12px", background: "none", border: "none",
+                        borderRadius: "10px", color: "#ff6b6b",
+                        fontSize: "13px", fontWeight: "500",
+                        cursor: "pointer", textAlign: "left", fontFamily: "inherit",
+                        transition: "background 0.12s",
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = "rgba(255,59,59,0.08)"}
+                      onMouseLeave={e => e.currentTarget.style.background = "none"}
+                    >
+                      <LogOutIcon size={14} />
+                      Disconnect
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
